@@ -1,14 +1,12 @@
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Scanner;
 
 public class Main {
+    Scanner scanner = new Scanner(System.in);
     private ArrayList<Medlem> medlemmer = new ArrayList<>();
-    private ArrayList<Medlem> crawlJunior = new ArrayList<>();
-    private ArrayList<Medlem> crawlSenior = new ArrayList<>();
-    private ArrayList<Medlem> brystsvømningJunior = new ArrayList<>();
-    private ArrayList<Medlem> brystsvømningSenior = new ArrayList<>();
-    private ArrayList<Medlem> butterflyJunior = new ArrayList<>();
-    private ArrayList<Medlem> butterflySenior = new ArrayList<>();
 
     public static void main(String[] args) {
         new Main().run();
@@ -16,7 +14,7 @@ public class Main {
 
     private void run() {
         boolean kørProgram = true;
-        Menu menu = new Menu("**** Menu ****", "Vælg en mulighed:\n", new String[]{
+        Menu menu = new Menu("**** Menu ****", "Vælg en mulighed:", new String[]{
                 "1. Formand",
                 "2. Træner",
                 "3. Kassér"
@@ -29,9 +27,9 @@ public class Main {
             switch (brugervalg) {
                 case 1:
                     boolean kørProgram1 = true;
-                    Menu formandMenu = new Menu("**** FORMAND ****", "Vælg en mulighed", new String[]{
+                    Menu formandMenu = new Menu("**** FORMAND ****", "Vælg en mulighed: ", new String[]{
                             "1. Opret medlem",
-                            "2. bla bla bla",
+                            "2. Se medlemmer",
                             "3. bla bla"
                     });
 
@@ -43,14 +41,15 @@ public class Main {
                                 opretMedlem();
                                 break;
                             case 2:
+                                tjekListe();
+
                             case 3:
                         }
                     }
                     break;
-
                 case 2:
                     boolean kørProgram2 = true;
-                    Menu trænerMenu = new Menu("**** TRÆNER ****", "Vælg en mulighed:", new String[]{
+                    Menu trænerMenu = new Menu("**** TRÆNER ****", "Vælg en mulighed: ", new String[]{
                             "1. cjeicnoew",
                             "2. hallooo",
                             "3. tihi"
@@ -66,12 +65,11 @@ public class Main {
                         }
                     }
                     break;
-
                 case 3:
                     boolean kørProgram3 = true;
-                    Menu kasserMenu = new Menu("**** KASSER ****", "Vælg en mulighed:", new String[]{
+                    Menu kasserMenu = new Menu("**** KASSER ****", "Vælg en mulighed: ", new String[]{
                             "1. gutchi gutchi",
-                            "2. tara er en sej",
+                            "2. tara er en mørksej",
                             "3. something"
                     });
 
@@ -92,62 +90,121 @@ public class Main {
         }
     }
 
-    public void opretMedlem() {
-        Filer filer = new Filer(); // Skal vi have et filNavn?
+    private void tjekListe() {
+        for (int i = 0; i < medlemmer.size(); i++) {
+            System.out.println(medlemmer.get(i));
+        }
 
-        Scanner scanner = new Scanner(System.in);
+    }
+
+    public void opretMedlem() {
         System.out.println("** OPRET NYT MEDLEM **");
         System.out.println("Indtast fulde navn:");
         String navn = scanner.nextLine();
 
         System.out.println("Indtast fødselsår: (YYYY)");
         int fødselsår = scanner.nextInt();
-        scanner.nextLine();
-        // Medlem medlem = new Medlem();
-        // medlem.udregnMedlemsAlder(alder);
-        int alder = 2023 - fødselsår;
+        scanner.nextLine(); // Ryd buffer efter at have læst et tal
 
-        System.out.println("Indtast aktivitetsform: (Hvis aktiv tast 'A' / Hvis passiv tast 'P')");
-        String aktivEllerPassiv = scanner.nextLine();
-        Medlem medlem = new Medlem();
-        medlem.erMedlemmetAktivEllerPassiv();
+        String aktivEllerPassivSomOrd = aktivEllerPassivSomOrd(); // Spørg kun én gang
+        String motionistEllerKonkurrenceSomOrd = motionistEllerKonkurrenceSomOrd(); // Spørg kun én gang
 
-        System.out.println("Indtast aktivitetstype: (Hvis motionist tast 'M' / Hvis konkurrencesvømmer tast 'K')");
-        String motionistEllerKonkurrence = scanner.nextLine();
+        Medlem nytMedlem = new Medlem(navn, fødselsår, aktivEllerPassivSomOrd, motionistEllerKonkurrenceSomOrd);
+        if (nytMedlem.getMotionistEllerKonkurrence().equalsIgnoreCase("konkurrence")) {
+            opretKonkurrenceSvømmer(nytMedlem);
+        } else {
+            medlemmer.add(nytMedlem);
+            System.out.println("Medlem oprettet: " + nytMedlem);
+        }
+    }
 
-        Medlem nytMedlem = new Medlem(navn, fødselsår, aktivEllerPassiv, motionistEllerKonkurrence);
-        Konkurrencesvømmer konkurrencesvømmer = new Konkurrencesvømmer();
-        if (nytMedlem.getMotionistEllerKonkurrence().equalsIgnoreCase("k")) {
-            konkurrencesvømmer.erMedlemKonkurrenceSvømmer(nytMedlem);
-            if (nytMedlem.getFødselsår() >= 2005) {
-                if (nytMedlem.getSvømmedisciplin().equalsIgnoreCase("crawl")) {
-                    crawlJunior.add(nytMedlem);
-                }
-                if (nytMedlem.getSvømmedisciplin().equalsIgnoreCase("brystsvømning")) {
-                    brystsvømningJunior.add(nytMedlem);
-                }
-                else {
-                    butterflyJunior.add(nytMedlem);
-                }
+    public void opretKonkurrenceSvømmer(Medlem nytMedlem) {
+
+        System.out.println("Du er nu i gang med at oprette en konkurrence svømmer!");
+        System.out.println("Indtast hvilken svømmedisciplin medlemmet skal registreres i: ('c' for Crawl. 'b' for Brystsvømning. 'bf' for Butterfly)");
+        String svømmeDisciplin = scanner.nextLine();
+        String svømmeDisciplinSomOrd = svømmeDisciplinSomOrd();
+        System.out.println("Har medlemmet en bedste tid? (ja/nej)");
+        String jaEllerNej = scanner.nextLine();
+
+        if (jaEllerNej.equalsIgnoreCase("ja")) {
+            System.out.println("Hvad er medlemmets bedste tid?");
+            double bedsteTid = scanner.nextDouble();
+            scanner.nextLine(); // Ryd scannerens buffer
+
+            System.out.println("Hvilken dato havde medlemmet sin bedste tid? (format: dd-MM-yyyy)");
+            String datoStr = scanner.nextLine();
+
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+            LocalDate dato = null;
+            try {
+                dato = LocalDate.parse(datoStr, formatter);
+            } catch (DateTimeParseException e) {
+                System.out.println("Ugyldigt datoformat. Prøv igen.");
+                opretKonkurrenceSvømmer(nytMedlem);
             }
 
-            if (nytMedlem.getFødselsår() < 2005) {
-                if (nytMedlem.getSvømmedisciplin().equalsIgnoreCase("crawl")) {
-                    crawlSenior.add(nytMedlem);
-                }
-                if (nytMedlem.getSvømmedisciplin().equalsIgnoreCase("brystsvømning")) {
-                    brystsvømningSenior.add(nytMedlem);
-                }
-                else {
-                    butterflySenior.add(nytMedlem);
-                }
-            }
-            filer.gemFile(medlemmer);
+            Konkurrencesvømmer konkurrencesvømmer = new Konkurrencesvømmer(nytMedlem.getNavn(), nytMedlem.getFødselsår(), nytMedlem.getAktivEllerPassiv(), nytMedlem.getMotionistEllerKonkurrence(),
+                    svømmeDisciplinSomOrd, bedsteTid, dato);
+            medlemmer.add(konkurrencesvømmer);
+            System.out.println("Medlem oprettet: " + konkurrencesvømmer);
+        }
+        else {
+            double bedsteTid = 0;
+            LocalDate dato = null;
+            Konkurrencesvømmer konkurrencesvømmer = new Konkurrencesvømmer(nytMedlem.getNavn(), nytMedlem.getFødselsår(), nytMedlem.getAktivEllerPassiv(), nytMedlem.getMotionistEllerKonkurrence(),
+                    svømmeDisciplinSomOrd, bedsteTid, dato);
+            medlemmer.add(konkurrencesvømmer);
+            System.out.println("Medlem oprettet: " + konkurrencesvømmer);
+        }
 
-            System.out.println("Medlem oprettet.");
-            System.out.println("Medlem: " + nytMedlem.getAktivEllerPassiv() + " | " + nytMedlem.getNavn() + " | " + alder  + " \n "
-                    + nytMedlem.getMotionistEllerKonkurrence() + nytMedlem.getSvømmedisciplin() + nytMedlem.getJuniorEllerSenior() + "\n"
-                    + nytMedlem.getStævne() + nytMedlem.getDato() + nytMedlem.getBedsteTid() + nytMedlem.getPlacering());
+
+    }
+    public String aktivEllerPassivSomOrd() {
+        while (true) {
+            System.out.println("Indtast aktivitetsform: (Hvis aktiv tast 'A' / Hvis passiv tast 'P')");
+            String aEllerP = scanner.nextLine();
+
+            if (aEllerP.equalsIgnoreCase("a")) {
+                return "Aktiv";
+            } else if (aEllerP.equalsIgnoreCase("p")) {
+                return "Passiv";
+            } else {
+                System.out.println("Ugyldigt bogstav. Prøv igen.");
+            }
+        }
+    }
+
+    public String motionistEllerKonkurrenceSomOrd() {
+        while (true) {
+            System.out.println("Indtast aktivitetstype: (Hvis motionist tast 'M' / Hvis konkurrencesvømmer tast 'K')");
+            String mEllerK = scanner.nextLine();
+
+            if (mEllerK.equalsIgnoreCase("m")) {
+                return "Motionist";
+            } else if (mEllerK.equalsIgnoreCase("k")) {
+                return "Konkurrence";
+            } else {
+                System.out.println("Ugyldigt bogstav. Prøv igen.");
+            }
+        }
+    }
+
+
+    public String svømmeDisciplinSomOrd() {
+        while (true) {
+            System.out.println("Indtast hvilken svømmedisciplin medlemmet skal registreres i: ('c' for Crawl. 'b' for Brystsvømning. 'bf' for Butterfly)");
+            String bogstav = scanner.nextLine();
+
+            if (bogstav.equalsIgnoreCase("c")) {
+                return "Crawl";
+            } else if (bogstav.equalsIgnoreCase("b")) {
+                return "Brystsvømning";
+            } else if (bogstav.equalsIgnoreCase("bf")) {
+                return "Butterfly";
+            } else {
+                System.out.println("Ugyldigt bogstav. Prøv igen.");
+            }
         }
     }
 }

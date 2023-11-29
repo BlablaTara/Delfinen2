@@ -27,9 +27,7 @@ public class Filer {
         try {
             PrintStream ps = new PrintStream(file);
             for (Medlem medlem : medlemmer) {
-                ps.println(medlem.getMotionistEllerKonkurrence() + "," + medlem.getNavn() + "," + medlem.getFødselsår() //skal regnes om til alder.
-                        + "," + medlem.getSvømmedisciplin() + "," + medlem.getJuniorEllerSenior() + "," + medlem.getStævne() + ","
-                        + medlem.getDato() + "," + medlem.getBedsteTid() + "," + medlem.getPlacering());
+                ps.println(medlem.getMotionistEllerKonkurrence() + "," + medlem.getNavn() + "," + medlem.getFødselsår());
             }
             ps.close();
         } catch (FileNotFoundException e) {
