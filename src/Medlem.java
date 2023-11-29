@@ -60,7 +60,7 @@ public class Medlem {
     @Override
     public String toString() {
         return  "\n" + aktivEllerPassiv + ": \n " +
-                motionistEllerKonkurrence + ": " + navn + " | " + udregnMedlemsAlder() + " | " + erMedlemmetJuniorEllerSenior();
+                motionistEllerKonkurrence + ": " + navn + " | " + fødselsår + " | " ;
     }
 }
 
