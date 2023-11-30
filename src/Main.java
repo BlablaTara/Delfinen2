@@ -7,6 +7,10 @@ import java.util.Scanner;
 public class Main {
     Scanner scanner = new Scanner(System.in);
     private ArrayList<Medlem> medlemmer = new ArrayList<>();
+    private ArrayList<Medlem> medlemmerSomHarBetalt = new ArrayList<>();
+    private ArrayList<Medlem> medlemmerSomErIRestance = new ArrayList<>();
+    private ArrayList<Konkurrencesvømmer> konkurrenter = new ArrayList<>();
+    Filer filer = new Filer();
 
     public static void main(String[] args) {
         new Main().run();
@@ -14,7 +18,7 @@ public class Main {
 
     private void run() {
         boolean kørProgram = true;
-        Menu menu = new Menu("**** Menu ****", "Vælg en mulighed:", new String[]{
+        Menu menu = new Menu("** Menu **", "Vælg en mulighed:", new String[]{
                 "1. Formand",
                 "2. Træner",
                 "3. Kassér"
@@ -27,10 +31,10 @@ public class Main {
             switch (brugervalg) {
                 case 1:
                     boolean kørProgram1 = true;
-                    Menu formandMenu = new Menu("**** FORMAND ****", "Vælg en mulighed: ", new String[]{
+                    Menu formandMenu = new Menu("** FORMAND **", "Vælg en mulighed: ", new String[]{
                             "1. Opret medlem",
                             "2. Se medlemmer",
-                            "3. bla bla"
+                            "3. Gå tilbage til hoved-menuen"
                     });
 
                     while (kørProgram1) {
@@ -44,15 +48,16 @@ public class Main {
                                 tjekListe();
 
                             case 3:
+                                kørProgram1 = false;
                         }
                     }
                     break;
                 case 2:
                     boolean kørProgram2 = true;
-                    Menu trænerMenu = new Menu("**** TRÆNER ****", "Vælg en mulighed: ", new String[]{
+                    Menu trænerMenu = new Menu("** TRÆNER **", "Vælg en mulighed: ", new String[]{
                             "1. cjeicnoew",
                             "2. hallooo",
-                            "3. tihi"
+                            "3. Gå tilbage til hoved-menuen"
                     });
 
                     while (kørProgram2) {
@@ -62,15 +67,16 @@ public class Main {
                             case 1:
                             case 2:
                             case 3:
+                                kørProgram2 = false;
                         }
                     }
                     break;
                 case 3:
                     boolean kørProgram3 = true;
-                    Menu kasserMenu = new Menu("**** KASSER ****", "Vælg en mulighed: ", new String[]{
-                            "1. gutchi gutchi",
-                            "2. tara er en mørksej",
-                            "3. something"
+                    Menu kasserMenu = new Menu("** KASSER **", "Vælg en mulighed: ", new String[]{
+                            "1. Oversigt over medlemmer som har betalt kontingent",
+                            "2. Oversigt over medlemmer som er i restance.",
+                            "3. Gå tilbage til hoved-menuen"
                     });
 
                     while (kørProgram3) {
@@ -78,13 +84,16 @@ public class Main {
                         int brugervalg3 = menu.brugerensValg();
                         switch (brugervalg3) {
                             case 1:
+                                printListeOverMedlemmerSomHarBetaltKontingent();
                             case 2:
+                                printListeOverMedlemmerSomErIRestance();
                             case 3:
+                                kørProgram3 = false;
                         }
                     }
                     break;
                 default:
-                    System.out.println("Dette er ikke en mulighed. Prøv igen :)");
+                    System.out.println("Dette er ikke en mulighed. Prøv igen 🙂");
 
             }
         }
@@ -98,7 +107,7 @@ public class Main {
     }
 
     public void opretMedlem() {
-        System.out.println("** OPRET NYT MEDLEM **");
+        System.out.println("* OPRET NYT MEDLEM *");
         System.out.println("Indtast fulde navn:");
         String navn = scanner.nextLine();
 
@@ -107,34 +116,32 @@ public class Main {
         scanner.nextLine(); // Ryd buffer efter at have læst et tal
 
         String aktivEllerPassivSomOrd = aktivEllerPassivSomOrd(); // Spørg kun én gang
+        String erKontingentBetaltSomOrd = erKontingentBetaltSomOrd();
         String motionistEllerKonkurrenceSomOrd = motionistEllerKonkurrenceSomOrd(); // Spørg kun én gang
 
-        Medlem nytMedlem = new Medlem(navn, fødselsår, aktivEllerPassivSomOrd, motionistEllerKonkurrenceSomOrd);
+        Medlem nytMedlem = new Medlem(navn, fødselsår, aktivEllerPassivSomOrd, erKontingentBetaltSomOrd, motionistEllerKonkurrenceSomOrd);
+        // hvilkenKontingentListe(nytMedlem);
+
         if (nytMedlem.getMotionistEllerKonkurrence().equalsIgnoreCase("konkurrence")) {
             opretKonkurrenceSvømmer(nytMedlem);
         } else {
             medlemmer.add(nytMedlem);
             System.out.println("Medlem oprettet: " + nytMedlem);
+            filer.gemFileMotionist(nytMedlem);
         }
     }
 
     public void opretKonkurrenceSvømmer(Medlem nytMedlem) {
-
         System.out.println("Du er nu i gang med at oprette en konkurrence svømmer!");
-        System.out.println("Indtast hvilken svømmedisciplin medlemmet skal registreres i: ('c' for Crawl. 'b' for Brystsvømning. 'bf' for Butterfly)");
-        String svømmeDisciplin = scanner.nextLine();
         String svømmeDisciplinSomOrd = svømmeDisciplinSomOrd();
         System.out.println("Har medlemmet en bedste tid? (ja/nej)");
         String jaEllerNej = scanner.nextLine();
-
         if (jaEllerNej.equalsIgnoreCase("ja")) {
             System.out.println("Hvad er medlemmets bedste tid?");
             double bedsteTid = scanner.nextDouble();
             scanner.nextLine(); // Ryd scannerens buffer
-
             System.out.println("Hvilken dato havde medlemmet sin bedste tid? (format: dd-MM-yyyy)");
             String datoStr = scanner.nextLine();
-
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
             LocalDate dato = null;
             try {
@@ -144,18 +151,22 @@ public class Main {
                 opretKonkurrenceSvømmer(nytMedlem);
             }
 
-            Konkurrencesvømmer konkurrencesvømmer = new Konkurrencesvømmer(nytMedlem.getNavn(), nytMedlem.getFødselsår(), nytMedlem.getAktivEllerPassiv(), nytMedlem.getMotionistEllerKonkurrence(),
+            Konkurrencesvømmer konkurrencesvømmer = new Konkurrencesvømmer(nytMedlem.getNavn(), nytMedlem.getFødselsår(), nytMedlem.getAktivEllerPassiv(),
+                    nytMedlem.getErKontingentBetalt(), nytMedlem.getMotionistEllerKonkurrence(),
                     svømmeDisciplinSomOrd, bedsteTid, dato);
             medlemmer.add(konkurrencesvømmer);
             System.out.println("Medlem oprettet: " + konkurrencesvømmer);
+            filer.gemFileKonkurrenter(konkurrencesvømmer);
         }
         else {
             double bedsteTid = 0;
             LocalDate dato = null;
-            Konkurrencesvømmer konkurrencesvømmer = new Konkurrencesvømmer(nytMedlem.getNavn(), nytMedlem.getFødselsår(), nytMedlem.getAktivEllerPassiv(), nytMedlem.getMotionistEllerKonkurrence(),
+            Konkurrencesvømmer konkurrencesvømmer = new Konkurrencesvømmer(nytMedlem.getNavn(), nytMedlem.getFødselsår(), nytMedlem.getAktivEllerPassiv(), nytMedlem.getErKontingentBetalt(),
+                    nytMedlem.getMotionistEllerKonkurrence(),
                     svømmeDisciplinSomOrd, bedsteTid, dato);
-            medlemmer.add(konkurrencesvømmer);
+            // medlemmer.add(konkurrencesvømmer);
             System.out.println("Medlem oprettet: " + konkurrencesvømmer);
+            filer.gemFileKonkurrenter(konkurrencesvømmer);
         }
 
 
@@ -174,6 +185,49 @@ public class Main {
             }
         }
     }
+
+    public String erKontingentBetaltSomOrd() {
+        while (true) {
+            System.out.println("Vil medlemmet betale nu eller senere? Tast 'n' for nu. Tast 's' for senere.");
+            String nEllerS = scanner.nextLine();
+            if (nEllerS.equalsIgnoreCase("n")) {
+                System.out.println("Indtast datoen for kontingentbetalingen: (dd-mm-yyyy)");
+                String dato = scanner.nextLine();
+                return "Kontingent betalt " + dato;
+            }
+            else if (nEllerS.equalsIgnoreCase("s")) {
+                return "";
+            }
+            else {
+                System.out.println("Ugyldigt bogstav. Prøv igen.");
+
+            }
+        }
+    }
+
+    public String kontigentRestance(Medlem medlem) {
+        Betaling betaling = new Betaling();
+        double restance = betaling.udregnPris(medlem);
+
+        String restanceSomString = String.valueOf(restance);
+        return "Kontingent er ikke betalt. Restance på: " + restanceSomString;
+
+    }
+/*
+    public void hvilkenKontingentListe(Medlem nytMedlem) {
+        if (nytMedlem.getErKontingentBetalt().isEmpty()) {
+            nytMedlem.setErKontingentBetalt(kontigentRestance(nytMedlem));
+            medlemmerSomErIRestance.add(nytMedlem);
+        }
+        else {
+            medlemmerSomHarBetalt.add(nytMedlem);
+        }
+    }
+
+ */
+
+
+
 
     public String motionistEllerKonkurrenceSomOrd() {
         while (true) {
@@ -207,5 +261,16 @@ public class Main {
             }
         }
     }
-}
 
+    public void printListeOverMedlemmerSomHarBetaltKontingent() {
+        for (int i = 0; i < medlemmerSomHarBetalt.size(); i++) {
+            System.out.println(medlemmerSomHarBetalt.get(i));
+        }
+    }
+
+    public void printListeOverMedlemmerSomErIRestance() {
+        for (int i = 0; i < medlemmerSomErIRestance.size(); i++) {
+            System.out.println(medlemmerSomErIRestance.get(i));
+        }
+    }
+}

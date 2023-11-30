@@ -1,13 +1,16 @@
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Scanner;
 
 public class Filer {
+    Medlem medlem;
+    Konkurrencesvømmer konkurrencesvømmer;
 
     public void læsFile() {  // Denne er ikke færdig - kan først se hvad der skal vises ud når vi er ved enden.
-        File file = new File("medlemmer.txt");
+        File file = new File("motionister.txt");
         try (Scanner inFile = new Scanner(file)) {
             while (inFile.hasNextLine()) {
                 String s = inFile.nextLine();
@@ -22,16 +25,29 @@ public class Filer {
             throw new RuntimeException(e);
         }
     }
-    public void gemFile(ArrayList<Medlem> medlemmer) {
-        File file = new File("medlemmer.txt");
+
+    public void gemFileMotionist(Medlem medlem) {
+        File file = new File("motionister.txt");
         try {
-            PrintStream ps = new PrintStream(file);
-            for (Medlem medlem : medlemmer) {
-                ps.println(medlem.getMotionistEllerKonkurrence() + "," + medlem.getNavn() + "," + medlem.getFødselsår());
-            }
+            FileOutputStream fos = new FileOutputStream(file, true);
+            PrintStream ps = new PrintStream(fos);
+            ps.println(medlem);
+            ps.close();
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void gemFileKonkurrenter(Medlem medlem) {
+        File file = new File("konkurrenter.txt");
+        try {
+            FileOutputStream fos = new FileOutputStream(file, true);
+            PrintStream ps = new PrintStream(fos);
+            ps.println(medlem);
             ps.close();
         } catch (FileNotFoundException e) {
             throw new RuntimeException(e);
         }
     }
 }
+
