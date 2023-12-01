@@ -5,11 +5,15 @@ import java.util.ArrayList;
 import java.util.Scanner;
 
 public class Main {
+    Træner crawlTræner; // NY LINJE
+    Træner brystsvømningTræner; // NY LINJE
+    Træner butterflyTræner; // NY LINJE
     Scanner scanner = new Scanner(System.in);
     private ArrayList<Medlem> medlemmer = new ArrayList<>();
     private ArrayList<Medlem> medlemmerSomHarBetalt = new ArrayList<>();
     private ArrayList<Medlem> medlemmerSomErIRestance = new ArrayList<>();
     private ArrayList<Konkurrencesvømmer> konkurrenter = new ArrayList<>();
+    private ArrayList<Stævne> stævner = new ArrayList<>();
     Filer filer = new Filer();
 
     public static void main(String[] args) {
@@ -39,32 +43,35 @@ public class Main {
 
                     while (kørProgram1) {
                         formandMenu.printMenu();
-                        int brugervalg1 = menu.brugerensValg();
+                        int brugervalg1 = formandMenu.brugerensValg();
                         switch (brugervalg1) {
                             case 1:
                                 opretMedlem();
                                 break;
                             case 2:
                                 tjekListe();
-
+                                break;
                             case 3:
                                 kørProgram1 = false;
+                                break;
                         }
                     }
                     break;
                 case 2:
                     boolean kørProgram2 = true;
                     Menu trænerMenu = new Menu("** TRÆNER **", "Vælg en mulighed: ", new String[]{
-                            "1. cjeicnoew",
+                            "1. Opret en konkurrencesvømmers stævne",
                             "2. hallooo",
                             "3. Gå tilbage til hoved-menuen"
                     });
 
                     while (kørProgram2) {
                         trænerMenu.printMenu();
-                        int brugervalg2 = menu.brugerensValg();
+                        int brugervalg2 = trænerMenu.brugerensValg();
                         switch (brugervalg2) {
                             case 1:
+                                opretStævneTilEnKonkurrencesvømmer();
+                                break;
                             case 2:
                             case 3:
                                 kørProgram2 = false;
@@ -81,7 +88,7 @@ public class Main {
 
                     while (kørProgram3) {
                         kasserMenu.printMenu();
-                        int brugervalg3 = menu.brugerensValg();
+                        int brugervalg3 = kasserMenu.brugerensValg();
                         switch (brugervalg3) {
                             case 1:
                                 printListeOverMedlemmerSomHarBetaltKontingent();
@@ -103,7 +110,66 @@ public class Main {
         for (int i = 0; i < medlemmer.size(); i++) {
             System.out.println(medlemmer.get(i));
         }
+    }
 
+    public void hvilkenTrænerSkalMedlemmetHave(Konkurrencesvømmer medlem) { // NY METODE
+        if (medlem.getSvømmedisciplin().equalsIgnoreCase("crawl")) {
+            medlem.setTræner(crawlTræner);
+        }
+        if (medlem.getSvømmedisciplin().equalsIgnoreCase("brystsvømning")) {
+            medlem.setTræner(brystsvømningTræner);
+        }
+        if (medlem.getSvømmedisciplin().equalsIgnoreCase("butterfly")) {
+            medlem.setTræner(butterflyTræner);
+        }
+    }
+
+    public void opretTrænere() { // NY MEOTDE
+        crawlTræner = new Træner("Jamie");
+        brystsvømningTræner = new Træner("The Rock");
+        butterflyTræner = new Træner("David Hasselhoff");
+    }
+
+    public void opretStævneTilEnKonkurrencesvømmer() {
+        System.out.println("* OPRET STÆVNE *");
+        System.out.println("Indtast det medlem der har været til stævne's fulde navn: ");
+        String fuldeNavn = scanner.nextLine();
+
+        Konkurrencesvømmer konkurrencesvømmer = findMedlemUdFraFuldtNavn(fuldeNavn);
+
+        if (konkurrencesvømmer == null) {
+            System.out.println("Konkurrenten med navnet " + fuldeNavn + " kan ikke findes blandt medlemmer.");
+            return;
+        }
+
+        System.out.println("Indtast stævne-navn: ");
+        String stævneNavn = scanner.nextLine();
+
+        System.out.println("Indtast tid: (mm,ss)");
+        double tid = scanner.nextDouble();
+        scanner.nextLine();
+
+        System.out.println("Indtast din placering: ");
+        int placering = scanner.nextInt();
+        scanner.nextLine();
+
+        Stævne nytStævne = new Stævne(stævneNavn, tid, placering);
+        konkurrencesvømmer.tilføjStævne(nytStævne);
+
+        System.out.println("Stævne tilføjet til medlemmet: " + fuldeNavn + "\n" + nytStævne);
+        // TODO lav fil som gemmer stævne
+    }
+
+    private Konkurrencesvømmer findMedlemUdFraFuldtNavn(String fuldeNavn) {
+        for (Medlem medlem : medlemmer) {
+            System.out.println("Sammenligner:" + medlem.getNavn() + " med " + fuldeNavn);
+            if (medlem instanceof Konkurrencesvømmer && medlem.getNavn().equalsIgnoreCase(fuldeNavn)) {
+                System.out.println("Medlem fundet!");
+                return (Konkurrencesvømmer) medlem;
+            }
+        }
+        System.out.println("Medlem ikke fundet.");
+        return null;
     }
 
     public void opretMedlem() {
@@ -120,6 +186,7 @@ public class Main {
         String motionistEllerKonkurrenceSomOrd = motionistEllerKonkurrenceSomOrd(); // Spørg kun én gang
 
         Medlem nytMedlem = new Medlem(navn, fødselsår, aktivEllerPassivSomOrd, erKontingentBetaltSomOrd, motionistEllerKonkurrenceSomOrd);
+        // nytMedlem.setErKontingentBetalt(erKontingentBetaltSomOrd(nytMedlem)); // NY LINJE
         // hvilkenKontingentListe(nytMedlem);
 
         if (nytMedlem.getMotionistEllerKonkurrence().equalsIgnoreCase("konkurrence")) {
@@ -132,12 +199,13 @@ public class Main {
     }
 
     public void opretKonkurrenceSvømmer(Medlem nytMedlem) {
+        opretTrænere();
         System.out.println("Du er nu i gang med at oprette en konkurrence svømmer!");
         String svømmeDisciplinSomOrd = svømmeDisciplinSomOrd();
         System.out.println("Har medlemmet en bedste tid? (ja/nej)");
         String jaEllerNej = scanner.nextLine();
         if (jaEllerNej.equalsIgnoreCase("ja")) {
-            System.out.println("Hvad er medlemmets bedste tid?");
+            System.out.println("Hvad er medlemmets bedste tid? (mm,ss)");
             double bedsteTid = scanner.nextDouble();
             scanner.nextLine(); // Ryd scannerens buffer
             System.out.println("Hvilken dato havde medlemmet sin bedste tid? (format: dd-MM-yyyy)");
@@ -154,6 +222,7 @@ public class Main {
             Konkurrencesvømmer konkurrencesvømmer = new Konkurrencesvømmer(nytMedlem.getNavn(), nytMedlem.getFødselsår(), nytMedlem.getAktivEllerPassiv(),
                     nytMedlem.getErKontingentBetalt(), nytMedlem.getMotionistEllerKonkurrence(),
                     svømmeDisciplinSomOrd, bedsteTid, dato);
+            hvilkenTrænerSkalMedlemmetHave(konkurrencesvømmer); // NY LINJE
             medlemmer.add(konkurrencesvømmer);
             System.out.println("Medlem oprettet: " + konkurrencesvømmer);
             filer.gemFileKonkurrenter(konkurrencesvømmer);
@@ -164,9 +233,11 @@ public class Main {
             Konkurrencesvømmer konkurrencesvømmer = new Konkurrencesvømmer(nytMedlem.getNavn(), nytMedlem.getFødselsår(), nytMedlem.getAktivEllerPassiv(), nytMedlem.getErKontingentBetalt(),
                     nytMedlem.getMotionistEllerKonkurrence(),
                     svømmeDisciplinSomOrd, bedsteTid, dato);
+            hvilkenTrænerSkalMedlemmetHave(konkurrencesvømmer); // NY LINJE
             // medlemmer.add(konkurrencesvømmer);
             System.out.println("Medlem oprettet: " + konkurrencesvømmer);
             filer.gemFileKonkurrenter(konkurrencesvømmer);
+            medlemmer.add(konkurrencesvømmer); // DET HAR EMILIA SAT IND - SKAL LIGE SE OM DET VIRKER, VI KAN SNAKKE OM OM DET SKAL BLIVE ELLER EJ
         }
 
 
@@ -191,18 +262,31 @@ public class Main {
             System.out.println("Vil medlemmet betale nu eller senere? Tast 'n' for nu. Tast 's' for senere.");
             String nEllerS = scanner.nextLine();
             if (nEllerS.equalsIgnoreCase("n")) {
-                System.out.println("Indtast datoen for kontingentbetalingen: (dd-mm-yyyy)");
-                String dato = scanner.nextLine();
-                return "Kontingent betalt " + dato;
+                LocalDate dato = LocalDate.now();
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+                String formattedDato = dato.format(formatter);
+                return "Kontingent betalt " + formattedDato; //TODO Beløb på så vi kan se pris
             }
             else if (nEllerS.equalsIgnoreCase("s")) {
-                return "";
+                return "RESTANCE";
             }
             else {
                 System.out.println("Ugyldigt bogstav. Prøv igen.");
-
             }
         }
+    }
+
+    public String erKontingentBetaltSomOrd(Medlem medlem) {
+        if (medlem.getErKontingentBetalt().equalsIgnoreCase("Kontingent betalt")) {
+            LocalDate dato = LocalDate.now();
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+            String formattedDato = dato.format(formatter);
+            Betaling betaling = new Betaling();
+            double medlemsPris = betaling.udregnPris(medlem);
+            String medlemsPrisSomString = String.valueOf(medlemsPris);
+            return "Medlemskab på: " +medlemsPrisSomString +"kr. er betalt" + formattedDato;
+        }
+        return "";
     }
 
     public String kontigentRestance(Medlem medlem) {
@@ -210,23 +294,8 @@ public class Main {
         double restance = betaling.udregnPris(medlem);
 
         String restanceSomString = String.valueOf(restance);
-        return "Kontingent er ikke betalt. Restance på: " + restanceSomString;
-
+        return "Restance på: " + restanceSomString; //TODO Beløb på så vi kan se pris
     }
-/*
-    public void hvilkenKontingentListe(Medlem nytMedlem) {
-        if (nytMedlem.getErKontingentBetalt().isEmpty()) {
-            nytMedlem.setErKontingentBetalt(kontigentRestance(nytMedlem));
-            medlemmerSomErIRestance.add(nytMedlem);
-        }
-        else {
-            medlemmerSomHarBetalt.add(nytMedlem);
-        }
-    }
-
- */
-
-
 
 
     public String motionistEllerKonkurrenceSomOrd() {
@@ -263,14 +332,12 @@ public class Main {
     }
 
     public void printListeOverMedlemmerSomHarBetaltKontingent() {
-        for (int i = 0; i < medlemmerSomHarBetalt.size(); i++) {
-            System.out.println(medlemmerSomHarBetalt.get(i));
-        }
+        filer.læsFileMotionisterBetalt();
+        filer.læsFileKonkurrenterBetalt();
     }
 
     public void printListeOverMedlemmerSomErIRestance() {
-        for (int i = 0; i < medlemmerSomErIRestance.size(); i++) {
-            System.out.println(medlemmerSomErIRestance.get(i));
-        }
+        filer.læsFileMotionisterIRestance();
+        filer.læsFileKonkurrenterIRestance();
     }
 }

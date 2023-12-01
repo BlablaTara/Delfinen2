@@ -3,6 +3,7 @@ import java.time.format.DateTimeFormatter;
 
 public class Konkurrencesvømmer extends Medlem {
     private String svømmedisciplin;
+    private Træner træner; // NY LINJE
     private double bedsteTid;
     private LocalDate dato;
 
@@ -21,6 +22,9 @@ public class Konkurrencesvømmer extends Medlem {
     public double getBedsteTid() {
         return bedsteTid;
     }
+    public void setTræner(Træner træner) { // NY METODE
+        this.træner = træner;
+    }
 
     public LocalDate getDato() {
         return dato;
@@ -31,10 +35,9 @@ public class Konkurrencesvømmer extends Medlem {
         return dato.format(formatter);
     }
 
+
     @Override
     public String toString() {
-        return super.toString() + svømmedisciplin + " | " + dato + " | " + bedsteTid;
-
+        return super.toString() + svømmedisciplin + " | Træner: " + træner + " | " + dato + " | " + bedsteTid;
     }
-
 }

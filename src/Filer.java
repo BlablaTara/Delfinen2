@@ -9,16 +9,56 @@ public class Filer {
     Medlem medlem;
     Konkurrencesvømmer konkurrencesvømmer;
 
-    public void læsFile() {  // Denne er ikke færdig - kan først se hvad der skal vises ud når vi er ved enden.
+    public void læsFileMotionisterBetalt() {
         File file = new File("motionister.txt");
         try (Scanner inFile = new Scanner(file)) {
             while (inFile.hasNextLine()) {
                 String s = inFile.nextLine();
-                if (!s.isEmpty()) {
-                    String[] parts = s.split(",");
-                    String motionistEllerKonkurrence = parts[0];
-                    String navn = parts[1];
-                    String alder = parts[2];
+                if (s.trim().contains(",- Betalt d. ")) {
+                    //if (!s.contains("RESTANCE")) {
+                    System.out.println(s);
+                }
+            }
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+    }
+    public void læsFileKonkurrenterBetalt() {
+        File file = new File("konkurrenter.txt");
+        try (Scanner inFile = new Scanner(file)) {
+            while (inFile.hasNextLine()) {
+                String s = inFile.nextLine();
+                if (s.trim().contains(",- Betalt d. ")) {
+                    //if (!s.contains("RESTANCE")) {
+                    System.out.println(s);
+
+                }
+            }
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+    }
+    public void læsFileMotionisterIRestance() {
+        File file = new File("motionister.txt");
+        try (Scanner inFile = new Scanner(file)) {
+            while (inFile.hasNextLine()) {
+                String s = inFile.nextLine();
+                if (s.contains("Restance")) {
+                    System.out.println(s);
+                }
+            }
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+    }
+    public void læsFileKonkurrenterIRestance() {
+        File file = new File("konkurrenter.txt");
+        try (Scanner inFile = new Scanner(file)) {
+            while (inFile.hasNextLine()) {
+                String s = inFile.nextLine();
+                if (s.contains("RESTANCE")) {
+                    System.out.println(s);
+
                 }
             }
         } catch (FileNotFoundException e) {
@@ -31,7 +71,7 @@ public class Filer {
         try {
             FileOutputStream fos = new FileOutputStream(file, true);
             PrintStream ps = new PrintStream(fos);
-            ps.println(medlem);
+            ps.print(medlem);
             ps.close();
         } catch (FileNotFoundException e) {
             throw new RuntimeException(e);
@@ -43,7 +83,7 @@ public class Filer {
         try {
             FileOutputStream fos = new FileOutputStream(file, true);
             PrintStream ps = new PrintStream(fos);
-            ps.println(medlem);
+            ps.print(medlem);
             ps.close();
         } catch (FileNotFoundException e) {
             throw new RuntimeException(e);

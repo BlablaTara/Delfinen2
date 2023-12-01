@@ -1,4 +1,5 @@
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Scanner;
 
 public class Medlem {
@@ -9,6 +10,7 @@ public class Medlem {
     private String erKontingentBetalt;
     private String motionistEllerKonkurrence;
     private String juniorEllerSenior;
+    ArrayList<Stævne> stævner = new ArrayList<>();
 
 
     public Medlem(String navn, int fødselsår, String aktivEllerPassiv, String erKontingentBetalt, String motionistEllerKonkurrence) {
@@ -65,10 +67,14 @@ public class Medlem {
         }
     }
 
+    public void tilføjStævne(Stævne stævne) {
+        stævner.add(stævne);
+    }
+
+
     @Override
     public String toString() {
-        return  "\n" + aktivEllerPassiv + ": " +
-                motionistEllerKonkurrence + " | " + navn + " | " + fødselsår+ " | " ;
+        return  "\n" + aktivEllerPassiv + ": " + navn + " | " + setAlder(fødselsår) + " år | " + setJuniorEllerSenior(fødselsår)
+                + " | " + erKontingentBetalt + "\n" + motionistEllerKonkurrence + ": ";
     }
 }
-

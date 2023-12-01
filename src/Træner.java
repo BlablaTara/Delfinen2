@@ -8,4 +8,9 @@ public class Træner {
     public String getName() {
         return name;
     }
+
+    @Override // NY toString()
+    public String toString() {
+        return name;
+    }
 }
