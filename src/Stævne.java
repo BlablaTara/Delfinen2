@@ -9,6 +9,18 @@ public class Stævne {
         this.placering = placering;
     }
 
+    public String getStævneNavn() {
+        return stævneNavn;
+    }
+
+    public double getTid() {
+        return tid;
+    }
+
+    public int getPlacering() {
+        return placering;
+    }
+
     @Override
     public String toString() {
         return "Stævne: " + stævneNavn + " | Tid: " + tid + " | Placering: " + placering + ". plads";

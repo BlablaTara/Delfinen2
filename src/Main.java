@@ -1,8 +1,10 @@
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.time.LocalDate;
+import java.time.Year;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
-import java.util.ArrayList;
-import java.util.Scanner;
+import java.util.*;
 
 public class Main {
     Træner crawlTræner; // NY LINJE
@@ -49,7 +51,7 @@ public class Main {
                                 opretMedlem();
                                 break;
                             case 2:
-                                tjekListe();
+                                tjekListe(); // ændre denne til seMedlemmer()
                                 break;
                             case 3:
                                 kørProgram1 = false;
@@ -73,6 +75,7 @@ public class Main {
                                 opretStævneTilEnKonkurrencesvømmer();
                                 break;
                             case 2:
+                                // seOgSorterKonkurrencesvømmere();
                             case 3:
                                 kørProgram2 = false;
                         }
@@ -107,12 +110,30 @@ public class Main {
     }
 
     private void tjekListe() {
-        for (int i = 0; i < medlemmer.size(); i++) {
-            System.out.println(medlemmer.get(i));
+        filer.UdskrivKonkurrencesvømmer();
+        filer.UdskrivMotionister();
+    }
+
+    /*public void seOgSorterKonkurrencesvømmere() {
+        List<Konkurrencesvømmer> konkurrencesvømmere = new ArrayList<>();
+        for (Medlem medlem : medlemmer) {
+            if (medlem instanceof Konkurrencesvømmer) {
+                konkurrencesvømmere.add((Konkurrencesvømmer) medlem);
+            }
+        }
+
+        Collections.sort(konkurrencesvømmere, new DisciplinComparator());
+
+                System.out.println("Sorterede konkurrencesvømmere:");
+        for (Konkurrencesvømmer svømmer : konkurrencesvømmere) {
+            System.out.println(svømmer.getNavn() + " - " + svømmer.getSvømmedisciplin());
         }
     }
 
-    public void hvilkenTrænerSkalMedlemmetHave(Konkurrencesvømmer medlem) { // NY METODE
+     */
+
+
+    public void hvilkenTrænerSkalMedlemmetHave(Konkurrencesvømmer medlem) {
         if (medlem.getSvømmedisciplin().equalsIgnoreCase("crawl")) {
             medlem.setTræner(crawlTræner);
         }
@@ -124,18 +145,18 @@ public class Main {
         }
     }
 
-    public void opretTrænere() { // NY MEOTDE
+    public void opretTrænere() {
         crawlTræner = new Træner("Jamie");
         brystsvømningTræner = new Træner("The Rock");
         butterflyTræner = new Træner("David Hasselhoff");
     }
 
-    public void opretStævneTilEnKonkurrencesvømmer() {
+    public void opretStævneTilEnKonkurrencesvømmer() { // NYE LINJER HER
         System.out.println("* OPRET STÆVNE *");
         System.out.println("Indtast det medlem der har været til stævne's fulde navn: ");
         String fuldeNavn = scanner.nextLine();
 
-        Konkurrencesvømmer konkurrencesvømmer = findMedlemUdFraFuldtNavn(fuldeNavn);
+        Konkurrencesvømmer konkurrencesvømmer = læsKonkurrencesvømmersFuldeNavnFraFil(fuldeNavn);
 
         if (konkurrencesvømmer == null) {
             System.out.println("Konkurrenten med navnet " + fuldeNavn + " kan ikke findes blandt medlemmer.");
@@ -145,49 +166,98 @@ public class Main {
         System.out.println("Indtast stævne-navn: ");
         String stævneNavn = scanner.nextLine();
 
-        System.out.println("Indtast tid: (mm,ss)");
-        double tid = scanner.nextDouble();
-        scanner.nextLine();
+        double tid = 0;
+        boolean validtInput = false;
 
-        System.out.println("Indtast din placering: ");
-        int placering = scanner.nextInt();
-        scanner.nextLine();
+        do {
+            try {
+                System.out.println("Indtast tid: (mm,ss)");
+                tid = indtastGyldigTid();
+                validtInput = true;
+            } catch (InputMismatchException e) {
+                System.out.println("Ugyldigt svar. Prøv igen.");
+            }
+        } while (!validtInput);
+
+        int placering = 0;
+
+        do {
+            validtInput = false;
+            try {
+                System.out.println("Indtast din placering: ");
+                placering = scanner.nextInt();
+                scanner.nextLine();
+                validtInput = true;
+            } catch (InputMismatchException e) {
+                System.out.println("Ugyldigt svar. Prøv igen.");
+                scanner.nextLine();
+            }
+        } while (!validtInput);
 
         Stævne nytStævne = new Stævne(stævneNavn, tid, placering);
         konkurrencesvømmer.tilføjStævne(nytStævne);
 
         System.out.println("Stævne tilføjet til medlemmet: " + fuldeNavn + "\n" + nytStævne);
-        // TODO lav fil som gemmer stævne
+        filer.gemFileKonkurrenterMedStævne(konkurrencesvømmer);
+        filer.fjernKonkurrentFraFil(konkurrencesvømmer);
     }
 
-    private Konkurrencesvømmer findMedlemUdFraFuldtNavn(String fuldeNavn) {
-        for (Medlem medlem : medlemmer) {
-            System.out.println("Sammenligner:" + medlem.getNavn() + " med " + fuldeNavn);
-            if (medlem instanceof Konkurrencesvømmer && medlem.getNavn().equalsIgnoreCase(fuldeNavn)) {
-                System.out.println("Medlem fundet!");
-                return (Konkurrencesvømmer) medlem;
+    /* private Konkurrencesvømmer findMedlemUdFraFuldtNavn(String fuldeNavn) {
+         for (Medlem medlem : medlemmer) {
+             if (medlem instanceof Konkurrencesvømmer && medlem.getNavn().equalsIgnoreCase(fuldeNavn)) {
+                 System.out.println("Medlem fundet!");
+                 return (Konkurrencesvømmer) medlem;
+             }
+         }
+         System.out.println("Medlem ikke fundet.");
+         return null;
+     }
+
+     */
+    public Konkurrencesvømmer læsKonkurrencesvømmersFuldeNavnFraFil(String fuldeNavn) {
+        File file = new File("konkurrenter.txt");
+        try {
+            Scanner inFile = new Scanner(file);
+
+            while (inFile.hasNextLine()){
+                String s = inFile.nextLine();
+                if (s.contains(fuldeNavn)) {
+                    System.out.println("Medlem fundet*: \n" + s);
+                }
             }
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
         }
-        System.out.println("Medlem ikke fundet.");
+        System.out.println("Medlem ikke fundet*");
         return null;
     }
 
-    public void opretMedlem() {
+    public void opretMedlem() { // NYE LINJER HER
         System.out.println("* OPRET NYT MEDLEM *");
         System.out.println("Indtast fulde navn:");
         String navn = scanner.nextLine();
 
-        System.out.println("Indtast fødselsår: (YYYY)");
-        int fødselsår = scanner.nextInt();
-        scanner.nextLine(); // Ryd buffer efter at have læst et tal
+        int fødselsår;
+        while (true) { // NY while-løkke, for at finde ud af om fødselsåret er validt!
+            System.out.println("Indtast fødselsår: (YYYY)");
+            fødselsår = scanner.nextInt();
+            scanner.nextLine();
 
-        String aktivEllerPassivSomOrd = aktivEllerPassivSomOrd(); // Spørg kun én gang
+            if (erFødselsåretValidt(fødselsår)) {
+                break; // HJÆLP PATRICK! Må man bruge break i netop denne situation?
+            } else {
+                System.out.println("Ugyldigt fødselsår. Indtast et gyldigt år, eller kontakt personalet for spørgsmål."); // hehe er jeg ikke sjov
+            }
+        } // NY går herned til
+
+        String aktivEllerPassivSomOrd = aktivEllerPassivSomOrd();
         String erKontingentBetaltSomOrd = erKontingentBetaltSomOrd();
-        String motionistEllerKonkurrenceSomOrd = motionistEllerKonkurrenceSomOrd(); // Spørg kun én gang
+        String motionistEllerKonkurrenceSomOrd = motionistEllerKonkurrenceSomOrd();
 
         Medlem nytMedlem = new Medlem(navn, fødselsår, aktivEllerPassivSomOrd, erKontingentBetaltSomOrd, motionistEllerKonkurrenceSomOrd);
-        // nytMedlem.setErKontingentBetalt(erKontingentBetaltSomOrd(nytMedlem)); // NY LINJE
-        // hvilkenKontingentListe(nytMedlem);
+
+        nytMedlem.setErKontingentBetalt(erKontingentBetaltSomOrd(nytMedlem)); // NY LINJE
+
 
         if (nytMedlem.getMotionistEllerKonkurrence().equalsIgnoreCase("konkurrence")) {
             opretKonkurrenceSvømmer(nytMedlem);
@@ -198,26 +268,56 @@ public class Main {
         }
     }
 
+    public boolean erFødselsåretValidt(int år) { // NY METODE
+        int aktueltÅr = Year.now().getValue();
+        return år >= aktueltÅr - 100 && år <= aktueltÅr - 1;
+    }
+
     public void opretKonkurrenceSvømmer(Medlem nytMedlem) {
         opretTrænere();
         System.out.println("Du er nu i gang med at oprette en konkurrence svømmer!");
         String svømmeDisciplinSomOrd = svømmeDisciplinSomOrd();
-        System.out.println("Har medlemmet en bedste tid? (ja/nej)");
-        String jaEllerNej = scanner.nextLine();
+
+        String jaEllerNej;
+        do {
+            System.out.println("Har medlemmet en bedste tid? (ja/nej)");
+            jaEllerNej = scanner.nextLine();
+
+            if (!jaEllerNej.equalsIgnoreCase("ja") && !jaEllerNej.equalsIgnoreCase("nej")) {
+                System.out.println("Ugyldigt svar. Prøv igen.");
+            }
+        } while (!jaEllerNej.equalsIgnoreCase("ja") && !jaEllerNej.equalsIgnoreCase("nej"));
+
         if (jaEllerNej.equalsIgnoreCase("ja")) {
-            System.out.println("Hvad er medlemmets bedste tid? (mm,ss)");
-            double bedsteTid = scanner.nextDouble();
-            scanner.nextLine(); // Ryd scannerens buffer
+            double bedsteTid;
+            try {
+                System.out.println("Hvad er medlemmets bedste tid? (mm,ss)");
+                bedsteTid = indtastGyldigTid();
+            } catch (InputMismatchException e) {
+                System.out.println("Ugyldigt svar. Prøv igen.");
+                opretKonkurrenceSvømmer(nytMedlem);
+                return;
+            }
+
             System.out.println("Hvilken dato havde medlemmet sin bedste tid? (format: dd-MM-yyyy)");
             String datoStr = scanner.nextLine();
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
             LocalDate dato = null;
+
             try {
-                dato = LocalDate.parse(datoStr, formatter);
+                // dato = LocalDate.parse(datoStr, formatter);
+                String formatteretDato = datoStr.formatted(formatter);
             } catch (DateTimeParseException e) {
                 System.out.println("Ugyldigt datoformat. Prøv igen.");
                 opretKonkurrenceSvømmer(nytMedlem);
+                return;
             }
+/*
+            LocalDate dato = LocalDate.now();
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+            String formattedDato = datoStr.format(formatter);
+
+ */
 
             Konkurrencesvømmer konkurrencesvømmer = new Konkurrencesvømmer(nytMedlem.getNavn(), nytMedlem.getFødselsår(), nytMedlem.getAktivEllerPassiv(),
                     nytMedlem.getErKontingentBetalt(), nytMedlem.getMotionistEllerKonkurrence(),
@@ -226,22 +326,42 @@ public class Main {
             medlemmer.add(konkurrencesvømmer);
             System.out.println("Medlem oprettet: " + konkurrencesvømmer);
             filer.gemFileKonkurrenter(konkurrencesvømmer);
-        }
-        else {
-            double bedsteTid = 0;
-            LocalDate dato = null;
+        } else {
+            // double bedsteTid = 0;
+            // LocalDate dato = null;
             Konkurrencesvømmer konkurrencesvømmer = new Konkurrencesvømmer(nytMedlem.getNavn(), nytMedlem.getFødselsår(), nytMedlem.getAktivEllerPassiv(), nytMedlem.getErKontingentBetalt(),
                     nytMedlem.getMotionistEllerKonkurrence(),
-                    svømmeDisciplinSomOrd, bedsteTid, dato);
+                    svømmeDisciplinSomOrd, 0, null);
+
             hvilkenTrænerSkalMedlemmetHave(konkurrencesvømmer); // NY LINJE
             // medlemmer.add(konkurrencesvømmer);
             System.out.println("Medlem oprettet: " + konkurrencesvømmer);
             filer.gemFileKonkurrenter(konkurrencesvømmer);
             medlemmer.add(konkurrencesvømmer); // DET HAR EMILIA SAT IND - SKAL LIGE SE OM DET VIRKER, VI KAN SNAKKE OM OM DET SKAL BLIVE ELLER EJ
         }
-
-
     }
+
+    public double indtastGyldigTid() throws InputMismatchException {
+        double bedsteTid = 0;
+        boolean korrektFormat = false;
+
+        while (!korrektFormat) {
+            try {
+                String tidInput = scanner.nextLine();
+                String[] tidArray = tidInput.split(",");
+                int minutter = Integer.parseInt(tidArray[0].trim());
+                int sekunder = Integer.parseInt(tidArray[1].trim());
+
+                bedsteTid = minutter + sekunder / 100.0; // Gem som decimaltal
+
+                korrektFormat = true;
+            } catch (NumberFormatException | ArrayIndexOutOfBoundsException e) {
+                System.out.println("Ugyldigt tidsformat. Prøv igen (mm,ss):");
+            }
+        }
+        return bedsteTid;
+    }
+
     public String aktivEllerPassivSomOrd() {
         while (true) {
             System.out.println("Indtast aktivitetsform: (Hvis aktiv tast 'A' / Hvis passiv tast 'P')");
@@ -262,31 +382,30 @@ public class Main {
             System.out.println("Vil medlemmet betale nu eller senere? Tast 'n' for nu. Tast 's' for senere.");
             String nEllerS = scanner.nextLine();
             if (nEllerS.equalsIgnoreCase("n")) {
-                LocalDate dato = LocalDate.now();
-                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
-                String formattedDato = dato.format(formatter);
-                return "Kontingent betalt " + formattedDato; //TODO Beløb på så vi kan se pris
-            }
-            else if (nEllerS.equalsIgnoreCase("s")) {
+                LocalDate dato = LocalDate.now(); // kan slettes tror jeg
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy"); // kan slettes tror jeg
+                String formattedDato = dato.format(formatter); // kan slettes tror jeg
+                return "Kontingent betalt ";// + formattedDato; // DET VAR ET MELLEMRUM DER GJORDE FEJLEN
+            } else if (nEllerS.equalsIgnoreCase("s")) {
                 return "RESTANCE";
-            }
-            else {
+            } else {
                 System.out.println("Ugyldigt bogstav. Prøv igen.");
             }
         }
     }
 
     public String erKontingentBetaltSomOrd(Medlem medlem) {
-        if (medlem.getErKontingentBetalt().equalsIgnoreCase("Kontingent betalt")) {
+        if (medlem.getErKontingentBetalt().equalsIgnoreCase("Kontingent betalt ")) { // LAVET ET MELLEMRUM
             LocalDate dato = LocalDate.now();
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
             String formattedDato = dato.format(formatter);
             Betaling betaling = new Betaling();
             double medlemsPris = betaling.udregnPris(medlem);
             String medlemsPrisSomString = String.valueOf(medlemsPris);
-            return "Medlemskab på: " +medlemsPrisSomString +"kr. er betalt" + formattedDato;
+            return "Medlemskab på: " + medlemsPrisSomString + "kr. er betalt d. " + formattedDato;
         }
-        return "";
+        String returnText = kontigentRestance(medlem); // DETTE ER NYT
+        return returnText; // DETTE ER NYT
     }
 
     public String kontigentRestance(Medlem medlem) {
