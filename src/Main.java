@@ -156,7 +156,7 @@ public class Main {
         System.out.println("Indtast det medlem der har været til stævne's fulde navn: ");
         String fuldeNavn = scanner.nextLine();
 
-        Konkurrencesvømmer konkurrencesvømmer = læsKonkurrencesvømmersFuldeNavnFraFil(fuldeNavn);
+        Konkurrencesvømmer konkurrencesvømmer = findMedlemUdFraFuldtNavn(fuldeNavn);
 
         if (konkurrencesvømmer == null) {
             System.out.println("Konkurrenten med navnet " + fuldeNavn + " kan ikke findes blandt medlemmer.");
@@ -202,7 +202,7 @@ public class Main {
         filer.fjernKonkurrentFraFil(konkurrencesvømmer);
     }
 
-    /* private Konkurrencesvømmer findMedlemUdFraFuldtNavn(String fuldeNavn) {
+     private Konkurrencesvømmer findMedlemUdFraFuldtNavn(String fuldeNavn) {
          for (Medlem medlem : medlemmer) {
              if (medlem instanceof Konkurrencesvømmer && medlem.getNavn().equalsIgnoreCase(fuldeNavn)) {
                  System.out.println("Medlem fundet!");
@@ -213,8 +213,8 @@ public class Main {
          return null;
      }
 
-     */
-    public Konkurrencesvømmer læsKonkurrencesvømmersFuldeNavnFraFil(String fuldeNavn) {
+
+   /* public Konkurrencesvømmer læsKonkurrencesvømmersFuldeNavnFraFil(String fuldeNavn) {
         File file = new File("konkurrenter.txt");
         try {
             Scanner inFile = new Scanner(file);
@@ -231,6 +231,8 @@ public class Main {
         System.out.println("Medlem ikke fundet*");
         return null;
     }
+
+    */
 
     public void opretMedlem() { // NYE LINJER HER
         System.out.println("* OPRET NYT MEDLEM *");
