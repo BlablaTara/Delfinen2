@@ -114,23 +114,21 @@ public class Main {
         filer.UdskrivMotionister();
     }
 
-    /*public void seOgSorterKonkurrencesvømmere() {
+    public void seOgSorterKonkurrencesvømmere() {
         List<Konkurrencesvømmer> konkurrencesvømmere = new ArrayList<>();
         for (Medlem medlem : medlemmer) {
             if (medlem instanceof Konkurrencesvømmer) {
                 konkurrencesvømmere.add((Konkurrencesvømmer) medlem);
             }
         }
+        DiciplingComparator diciplingComparator = new DiciplingComparator();
+        Collections.sort(konkurrencesvømmere, diciplingComparator);
 
-        Collections.sort(konkurrencesvømmere, new DisciplinComparator());
-
-                System.out.println("Sorterede konkurrencesvømmere:");
+        System.out.println("Sorterede konkurrencesvømmere:");
         for (Konkurrencesvømmer svømmer : konkurrencesvømmere) {
             System.out.println(svømmer.getNavn() + " - " + svømmer.getSvømmedisciplin());
         }
     }
-
-     */
 
 
     public void hvilkenTrænerSkalMedlemmetHave(Konkurrencesvømmer medlem) {
@@ -198,8 +196,9 @@ public class Main {
         konkurrencesvømmer.tilføjStævne(nytStævne);
 
         System.out.println("Stævne tilføjet til medlemmet: " + fuldeNavn + "\n" + nytStævne);
-        filer.gemFileKonkurrenterMedStævne(konkurrencesvømmer);
-        filer.fjernKonkurrentFraFil(konkurrencesvømmer);
+        filer.gemFileKonkurrenter(konkurrencesvømmer);
+        //filer.gemFileKonkurrenterMedStævne(konkurrencesvømmer);
+        //filer.fjernKonkurrentFraFil(konkurrencesvømmer);
     }
 
      private Konkurrencesvømmer findMedlemUdFraFuldtNavn(String fuldeNavn) {
