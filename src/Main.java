@@ -165,12 +165,12 @@ public class Main {
                 }
             }
         }
-        Collections.sort(crawlJuniorSvømmere, new DiciplingComparator());
-        Collections.sort(crawlSeniorSvømmere, new DiciplingComparator());
-        Collections.sort(brystJuniorSvømmere, new DiciplingComparator());
-        Collections.sort(brystSeniorSvømmere, new DiciplingComparator());
-        Collections.sort(butterFlyJuniorSvømmere, new DiciplingComparator());
-        Collections.sort(butterFlySeniorSvømmere, new DiciplingComparator());
+        Collections.sort(crawlJuniorSvømmere, new KonkurrencesvømmerBedsteTidComparator());
+        Collections.sort(crawlSeniorSvømmere, new KonkurrencesvømmerBedsteTidComparator());
+        Collections.sort(brystJuniorSvømmere, new KonkurrencesvømmerBedsteTidComparator());
+        Collections.sort(brystSeniorSvømmere, new KonkurrencesvømmerBedsteTidComparator());
+        Collections.sort(butterFlyJuniorSvømmere, new KonkurrencesvømmerBedsteTidComparator());
+        Collections.sort(butterFlySeniorSvømmere, new KonkurrencesvømmerBedsteTidComparator());
 
         System.out.println("\nTop 5 i Crawl(Junior):");
         visTop5(crawlJuniorSvømmere);
@@ -364,7 +364,7 @@ public class Main {
         } else {
             motionistMedlemmer.add(nytMedlem);
             System.out.println("Medlem oprettet: " + nytMedlem);
-            filer.gemMotionisterTilFil(motionistMedlemmer, "MotionistSvømmere.txt");
+            filer.gemMotionisterTilFil(motionistMedlemmer, "motionistsvømmere.txt");
 
         }
     }
@@ -560,7 +560,7 @@ public class Main {
         //  nytMedlem.getMotionistEllerKonkurrence(), svømmeDisciplinSomOrd, bedsteTid, dato, stævneNavn, stævneTid, placering); - emilias
         hvilkenTrænerSkalMedlemmetHave(konkurrencesvømmer);
         konkurrenceMedlemmer.add(konkurrencesvømmer);
-        filer.gemKonkurrenceTilFil(konkurrenceMedlemmer, "KonkurrenceSvømmere.txt");
+        filer.gemKonkurrenceTilFil(konkurrenceMedlemmer, "konkurrencesvømmere.txt");
         System.out.println("Medlem oprettet: " + konkurrencesvømmer);
         //filer.gemFileKonkurrenter(konkurrencesvømmer);
     }
