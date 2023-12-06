@@ -74,7 +74,11 @@ public class Medlem {
 
     @Override
     public String toString() {
-        return  "\n" + aktivEllerPassiv + ": " + navn + " | " + setAlder(fødselsår) + " år | " + setJuniorEllerSenior(fødselsår)
-                + " | " + erKontingentBetalt + "\n" + motionistEllerKonkurrence + ": ";
+        // Simpel og klar CSV format
+        return aktivEllerPassiv + "," + navn + "," + fødselsår + "," + erKontingentBetalt + "," + motionistEllerKonkurrence;
+    }
+    public boolean erJunior(){
+        int alder = LocalDateTime.now().getYear() - fødselsår;
+        return alder <18;
     }
 }
