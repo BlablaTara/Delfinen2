@@ -81,8 +81,11 @@ public class Filer {
         String svømmedisciplin = data[5];
         double bedsteTid = Double.parseDouble(data[6]);
         LocalDate dato = LocalDate.parse(data[7]);
+        String stævneNavn = data[8];
+        double stævneTid = Double.parseDouble(data[9]);
+        int stævnePlacering = Integer.parseInt(data[10]);
 
-        return new Konkurrencesvømmer(navn, fødselsår, aktivEllerPassiv, erKontingentBetalt, motionistEllerKonkurrence, svømmedisciplin, bedsteTid, dato);
+        return new Konkurrencesvømmer(navn, fødselsår, aktivEllerPassiv, erKontingentBetalt, motionistEllerKonkurrence, svømmedisciplin, bedsteTid, dato, stævneNavn, stævneTid, stævnePlacering);
     }
 
 

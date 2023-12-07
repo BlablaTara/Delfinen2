@@ -113,7 +113,7 @@ public class Main {
                         int brugervalg3 = kasserMenu.brugerensValg();
                         switch (brugervalg3) {
                             case 1:
-                                // printListeOverMedlemmerSomHarBetaltKontingent();
+                                seMedlemmerBetalt();
                                 break;
                             case 2:
                                 seMedlemmerRestance();
@@ -143,24 +143,26 @@ public class Main {
         for (Medlem medlem : konkurrenceMedlemmer) {
             if (medlem instanceof Konkurrencesvømmer) {
                 Konkurrencesvømmer svømmer = ((Konkurrencesvømmer) medlem);
-                if ("Crawl".equalsIgnoreCase(svømmer.getSvømmedisciplin())) {
-                    if (svømmer.erJunior()) {
-                        crawlJuniorSvømmere.add(svømmer);
-                    } else {
-                        crawlSeniorSvømmere.add(svømmer);
-                    }
-                } else if ("BrystSvømning".equalsIgnoreCase(svømmer.getSvømmedisciplin())) {
-                    if (svømmer.erJunior()) {
-                        brystJuniorSvømmere.add(svømmer);
-                    } else {
-                        brystSeniorSvømmere.add(svømmer);
-                    }
-                } else if ("Butterfly".equalsIgnoreCase(svømmer.getSvømmedisciplin())) {
-                    if (svømmer.erJunior()) {
-                        butterFlyJuniorSvømmere.add(svømmer);
-                    } else {
-                        butterFlySeniorSvømmere.add(svømmer);
+                if (svømmer.getBedsteTid() != 0) { // lille tilføjelse
+                    if ("Crawl".equalsIgnoreCase(svømmer.getSvømmedisciplin())) {
+                        if (svømmer.erJunior()) {
+                            crawlJuniorSvømmere.add(svømmer);
+                        } else {
+                            crawlSeniorSvømmere.add(svømmer);
+                        }
+                    } else if ("BrystSvømning".equalsIgnoreCase(svømmer.getSvømmedisciplin())) {
+                        if (svømmer.erJunior()) {
+                            brystJuniorSvømmere.add(svømmer);
+                        } else {
+                            brystSeniorSvømmere.add(svømmer);
+                        }
+                    } else if ("Butterfly".equalsIgnoreCase(svømmer.getSvømmedisciplin())) {
+                        if (svømmer.erJunior()) {
+                            butterFlyJuniorSvømmere.add(svømmer);
+                        } else {
+                            butterFlySeniorSvømmere.add(svømmer);
 
+                        }
                     }
                 }
             }
@@ -197,16 +199,20 @@ public class Main {
     }
 
 
-    public void hvilkenTrænerSkalMedlemmetHave(Konkurrencesvømmer medlem) {
+    public Træner hvilkenTrænerSkalMedlemmetHave(Konkurrencesvømmer medlem) {
         if (medlem.getSvømmedisciplin().equalsIgnoreCase("crawl")) {
             medlem.setTræner(crawlTræner);
+            return crawlTræner;
         }
         if (medlem.getSvømmedisciplin().equalsIgnoreCase("brystsvømning")) {
             medlem.setTræner(brystsvømningTræner);
+            return brystsvømningTræner;
         }
         if (medlem.getSvømmedisciplin().equalsIgnoreCase("butterfly")) {
             medlem.setTræner(butterflyTræner);
+            return butterflyTræner;
         }
+        return null;
     }
 
     public void opretTrænere() {
@@ -258,16 +264,21 @@ public class Main {
             }
         } while (!validtInput);
 
-        Stævne nytStævne = new Stævne(stævneNavn, tid, placering);
-        konkurrencesvømmer.tilføjStævne(nytStævne);
+        //Stævne nytStævne = new Stævne(stævneNavn, tid, placering); // LAVEDE FEJL I COMPILER
+        //konkurrencesvømmer.tilføjStævne(nytStævne); // LAVEDE FEJL I COMPILER
 
-        System.out.println("Stævne tilføjet til medlemmet: " + fuldeNavn + "\n" + nytStævne);
-        // filer.gemFileKonkurrenterMedStævne(konkurrencesvømmer);
-        // filer.fjernKonkurrentFraFil(konkurrencesvømmer);
+        konkurrencesvømmer.setStævneNavn(stævneNavn); // TILFØJET
+        konkurrencesvømmer.setStævneTid(tid);  // TILFØJET
+        konkurrencesvømmer.setStævnePlacering(placering);  // TILFØJET
+        filer.gemKonkurrenceTilFil(konkurrenceMedlemmer, "KonkurrenceSvømmere.txt");
+        System.out.println("Navn: " + konkurrencesvømmer.getNavn() + ", stævne: " + stævneNavn + ", tid: " + tid + ", placering: " + placering);
+        //System.out.println("Stævne tilføjet til medlemmet: " + fuldeNavn + "\n" + nytStævne); / LAVEDE FEJL I COMPILER
+
+
     }
 
     private Konkurrencesvømmer findMedlemUdFraFuldtNavn(String fuldeNavn) {
-        for (Medlem medlem : medlemmer) {
+        for (Medlem medlem : konkurrenceMedlemmer) { // ÆNDRET TIL DEN RIGTIGE LISTE
             if (medlem instanceof Konkurrencesvømmer && medlem.getNavn().equalsIgnoreCase(fuldeNavn)) {
                 System.out.println("Medlem fundet!");
                 return (Konkurrencesvømmer) medlem;
@@ -291,7 +302,9 @@ public class Main {
                 } else {
                     System.out.println(fuldeNavn + "'s gamle tid var hurtigere end " + nyTid);
                 }
-                System.out.println(konkurrenceMedlemmer.get(i));
+                System.out.print("Navn: " + konkurrenceMedlemmer.get(i).getNavn());
+                System.out.print(", Bedste tid: " + ((Konkurrencesvømmer) konkurrenceMedlemmer.get(i)).getBedsteTid());
+                System.out.print("min, Dato: " + ((Konkurrencesvømmer) konkurrenceMedlemmer.get(i)).getDato());
                 blevMedlemFundet = true;
             }
         }
@@ -303,26 +316,6 @@ public class Main {
     }
 
 
-    /*
-    public Konkurrencesvømmer læsKonkurrencesvømmersFuldeNavnFraFil(String fuldeNavn) {
-        File file = new File("konkurrenter.txt");
-        try {
-            Scanner inFile = new Scanner(file);
-
-            while (inFile.hasNextLine()){
-                String s = inFile.nextLine();
-                if (s.contains(fuldeNavn)) {
-                    System.out.println("Medlem fundet*: \n" + s);
-                }
-            }
-        } catch (FileNotFoundException e) {
-            throw new RuntimeException(e);
-        }
-        System.out.println("Medlem ikke fundet*");
-        return null;
-    }
-
-     */
 
     public void opretMedlem() { // NYE LINJER HER
         System.out.println("* OPRET NYT MEDLEM *");
@@ -374,114 +367,6 @@ public class Main {
         return år >= aktueltÅr - 100 && år <= aktueltÅr - 1;
     }
 
-    /* public void opretKonkurrenceSvømmer(Medlem nytMedlem) {
-        opretTrænere();
-        System.out.println("Du er nu i gang med at oprette en konkurrence svømmer!");
-        String svømmeDisciplinSomOrd = svømmeDisciplinSomOrd();
-
-        String jaEllerNej;
-        do {
-            System.out.println("Har medlemmet en bedste tid? (ja/nej)");
-            jaEllerNej = scanner.nextLine();
-
-            if (!jaEllerNej.equalsIgnoreCase("ja") && !jaEllerNej.equalsIgnoreCase("nej")) {
-                System.out.println("Ugyldigt svar. Prøv igen.");
-            }
-        } while (!jaEllerNej.equalsIgnoreCase("ja") && !jaEllerNej.equalsIgnoreCase("nej"));
-
-        if (jaEllerNej.equalsIgnoreCase("ja")) {
-            double bedsteTid;
-            try {
-                System.out.println("Hvad er medlemmets bedste tid? (mm,ss)");
-                bedsteTid = indtastGyldigTid();
-            } catch (InputMismatchException e) {
-                System.out.println("Ugyldigt svar. Prøv igen.");
-                opretKonkurrenceSvømmer(nytMedlem);
-                return;
-            }
-
-            System.out.println("Hvilken dato havde medlemmet sin bedste tid? (format: dd-MM-yyyy)");
-            String datoStr = scanner.nextLine();
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
-            LocalDate dato = null;
-
-            try {
-                dato = LocalDate.parse(datoStr, formatter);
-            } catch (DateTimeParseException e) {
-                System.out.println("Ugyldigt datoformat. Prøv igen.");
-                opretKonkurrenceSvømmer(nytMedlem);
-                return;
-            }
-
-            String stævneJaEllerNej;
-            do {
-                System.out.println("Har medlemmet været til et stævne? (ja/nej)");
-                stævneJaEllerNej = scanner.nextLine();
-
-                if (!stævneJaEllerNej.equalsIgnoreCase("ja") && !stævneJaEllerNej.equalsIgnoreCase("nej")) {
-                    System.out.println("Ugyldigt svar. Prøv igen.");
-                }
-            } while (!stævneJaEllerNej.equalsIgnoreCase("ja") && !stævneJaEllerNej.equalsIgnoreCase("nej"));
-
-
-            String stævneNavn = null;
-            if (stævneJaEllerNej.equalsIgnoreCase("ja")) {
-                System.out.println("Indtast stævne-navn: ");
-                stævneNavn = scanner.nextLine();
-
-                double stævneTid = 0;
-                boolean validtInput = false;
-
-                do {
-                    try {
-                        System.out.println("Indtast tid: (mm,ss)");
-                        stævneTid = indtastGyldigTid();
-                        validtInput = true;
-                    } catch (InputMismatchException e) {
-                        System.out.println("Ugyldigt svar. Prøv igen.");
-                    }
-                } while (!validtInput);
-
-                int placering = 0;
-
-                do {
-                    validtInput = false;
-                    try {
-                        System.out.println("Indtast din placering: ");
-                        placering = scanner.nextInt();
-                        scanner.nextLine();
-                        validtInput = true;
-                    } catch (InputMismatchException e) {
-                        System.out.println("Ugyldigt svar. Prøv igen.");
-                        scanner.nextLine();
-                    }
-                } while (!validtInput);
-
-                Konkurrencesvømmer konkurrencesvømmer = new Konkurrencesvømmer(nytMedlem.getNavn(), nytMedlem.getFødselsår(),
-                        nytMedlem.getAktivEllerPassiv(), nytMedlem.getErKontingentBetalt(),
-                        nytMedlem.getMotionistEllerKonkurrence(), svømmeDisciplinSomOrd, bedsteTid, dato, stævneNavn, stævneTid, placering);
-                hvilkenTrænerSkalMedlemmetHave(konkurrencesvømmer); // NY LINJE
-                medlemmer.add(konkurrencesvømmer);
-                // String formattedDato = dato.format(formatter); // NY LINJE
-                System.out.println("Medlem oprettet: " + konkurrencesvømmer);
-                filer.gemFileKonkurrenter(konkurrencesvømmer);
-            } else {
-                // double bedsteTid = 0;
-                // LocalDate dato = null;
-                Konkurrencesvømmer konkurrencesvømmer = new Konkurrencesvømmer(nytMedlem.getNavn(), nytMedlem.getFødselsår(), nytMedlem.getAktivEllerPassiv(), nytMedlem.getErKontingentBetalt(),
-                        nytMedlem.getMotionistEllerKonkurrence(),
-                        svømmeDisciplinSomOrd, 0, null, null, 0, 0);
-
-                hvilkenTrænerSkalMedlemmetHave(konkurrencesvømmer); // NY LINJE
-                // medlemmer.add(konkurrencesvømmer);
-                System.out.println("Medlem oprettet: " + konkurrencesvømmer);
-                filer.gemFileKonkurrenter(konkurrencesvømmer);
-                medlemmer.add(konkurrencesvømmer); // DET HAR EMILIA SAT IND - SKAL LIGE SE OM DET VIRKER, VI KAN SNAKKE OM OM DET SKAL BLIVE ELLER EJ
-            }
-        }
-    }
-
-     */
 
     public void opretKonkurrenceSvømmer(Medlem nytMedlem) {
         opretTrænere();
@@ -520,7 +405,7 @@ public class Main {
         System.out.println("Har medlemmet været til et stævne? (ja/nej)");
         String stævneJaEllerNej = scanner.nextLine();
 
-        String stævneNavn = null;
+        String stævneNavn = "Medlem har ikke deltaget i et stævne";
         double stævneTid = 0;
         int placering = 0;
 
@@ -556,13 +441,13 @@ public class Main {
 
         Konkurrencesvømmer konkurrencesvømmer = new Konkurrencesvømmer(nytMedlem.getNavn(), nytMedlem.getFødselsår(),
                 nytMedlem.getAktivEllerPassiv(), nytMedlem.getErKontingentBetalt(),
-                nytMedlem.getMotionistEllerKonkurrence(), svømmeDisciplinSomOrd, bedsteTid, dato);
-        //  nytMedlem.getMotionistEllerKonkurrence(), svømmeDisciplinSomOrd, bedsteTid, dato, stævneNavn, stævneTid, placering); - emilias
+                // nytMedlem.getMotionistEllerKonkurrence(), svømmeDisciplinSomOrd, bedsteTid, dato);
+                nytMedlem.getMotionistEllerKonkurrence(), svømmeDisciplinSomOrd, bedsteTid, dato, stævneNavn, stævneTid, placering);
         hvilkenTrænerSkalMedlemmetHave(konkurrencesvømmer);
         konkurrenceMedlemmer.add(konkurrencesvømmer);
         filer.gemKonkurrenceTilFil(konkurrenceMedlemmer, "konkurrencesvømmere.txt");
         System.out.println("Medlem oprettet: " + konkurrencesvømmer);
-        //filer.gemFileKonkurrenter(konkurrencesvømmer);
+
     }
 
     public double indtastGyldigTid() throws InputMismatchException {
@@ -675,33 +560,81 @@ public class Main {
     }
 
     public void seMedlemmer() {
-        System.out.println("Motionist medlemmer: ");
+        String linjer = "-------------------------------------------------------------------";
+        System.out.println(linjer + "Motionist medlemmer " + linjer + "\n");
         for (int i = 0; i < motionistMedlemmer.size(); i++) {
-            System.out.println(motionistMedlemmer.get(i));
+            System.out.print("Navn: " + motionistMedlemmer.get(i).getNavn());
+            int alder = LocalDate.now().getYear() - motionistMedlemmer.get(i).getFødselsår();
+            System.out.print(" - Alder: " + alder + " - Medlems status: " + motionistMedlemmer.get(i).getAktivEllerPassiv());
+            System.out.print(" - Kontingentbetaling: " + motionistMedlemmer.get(i).getErKontingentBetalt());
+            System.out.println(" - Motionist/Konkurrence: " + motionistMedlemmer.get(i).getMotionistEllerKonkurrence());
+
         }
-        System.out.println("Konkurrence medlemmer: ");
+        System.out.println("\n" + linjer + "Konkurrence medlemmer" + linjer + " \n ");
         for (int i = 0; i < konkurrenceMedlemmer.size(); i++) {
-            System.out.println(konkurrenceMedlemmer.get(i));
+            System.out.print("Navn: " + konkurrenceMedlemmer.get(i).getNavn());
+            int alder = LocalDate.now().getYear() - konkurrenceMedlemmer.get(i).getFødselsår();
+            System.out.print(" - Alder: " + alder + " - Medlems status: " + konkurrenceMedlemmer.get(i).getAktivEllerPassiv());
+            System.out.print(" - Kontingentbetaling: " + konkurrenceMedlemmer.get(i).getErKontingentBetalt());
+            System.out.println(" - Motionist/Konkurrence: " + konkurrenceMedlemmer.get(i).getMotionistEllerKonkurrence());
+            Medlem medlem = konkurrenceMedlemmer.get(i);
+            if (medlem instanceof Konkurrencesvømmer) {
+                Konkurrencesvømmer konkurrencesvømmer = (Konkurrencesvømmer) medlem;
+                opretTrænere();
+                konkurrencesvømmer.setTræner(hvilkenTrænerSkalMedlemmetHave(konkurrencesvømmer));
+                System.out.print("Svømmedisciplin: " + konkurrencesvømmer.getSvømmedisciplin());
+                System.out.print(" - Træner: " + konkurrencesvømmer.getTræner());
+                System.out.print(" - Bedste tid: " + konkurrencesvømmer.getBedsteTid());
+                System.out.print(" - Dato: " + konkurrencesvømmer.getDato());
+                System.out.print(" - Stævne: " + konkurrencesvømmer.getStævneNavn());
+                System.out.print(" - Stævne tid: " + konkurrencesvømmer.getStævneTid());
+                System.out.println(" - Stævne placering: " + konkurrencesvømmer.getStævnePlacering() + "\n");
+
+
+            }
+
+
         }
     }
 
     public void seMedlemmerRestance() {
-        System.out.println("Medlemmer der er i restance: ");
+        System.out.println("Medlemmer der er i restance:");
         for (int i = 0; i < motionistMedlemmer.size(); i++) {
             if (motionistMedlemmer.get(i).getErKontingentBetalt().contains("Restance")) {
-                System.out.println(motionistMedlemmer.get(i));
+                System.out.println(motionistMedlemmer.get(i).getNavn() + " - " + motionistMedlemmer.get(i).getErKontingentBetalt() + "kr");
             }
 
 
         }
+
         for (int i = 0; i < konkurrenceMedlemmer.size(); i++) {
             if (konkurrenceMedlemmer.get(i).getErKontingentBetalt().contains("Restance")) {
-                System.out.println(konkurrenceMedlemmer.get(i));
+                System.out.println(konkurrenceMedlemmer.get(i).getNavn() + " - " + konkurrenceMedlemmer.get(i).getErKontingentBetalt() + "kr");
             }
 
         }
 
 
     }
+
+    public void seMedlemmerBetalt() {
+        System.out.println("Medlemmer der har betalt: ");
+        for (int i = 0; i < motionistMedlemmer.size(); i++) {
+            if (motionistMedlemmer.get(i).getErKontingentBetalt().contains("betalt")) {
+                System.out.println(motionistMedlemmer.get(i).getNavn() + " - " + motionistMedlemmer.get(i).getErKontingentBetalt());
+            }
+
+
+        }
+        for (int i = 0; i < konkurrenceMedlemmer.size(); i++) {
+            if (konkurrenceMedlemmer.get(i).getErKontingentBetalt().contains("betalt")) {
+                System.out.println(konkurrenceMedlemmer.get(i).getNavn() + " - " + konkurrenceMedlemmer.get(i).getErKontingentBetalt());
+            }
+
+        }
+
+
+    }
+
 
 }
