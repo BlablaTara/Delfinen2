@@ -1,0 +1,4 @@
+Aktiv,Børge,1956,Medlemskab på: 1200.0kr. er betalt d. 06-12-2023,Motionist
+Aktiv,Vibeke,1942,Restance på: 1200.0,Motionist
+Passiv,Edith,1930,Medlemskab på: 500.0kr. er betalt d. 06-12-2023,Motionist
+Aktiv,Noah,2009,Medlemskab på: 1000.0kr. er betalt d. 06-12-2023,Motionist
