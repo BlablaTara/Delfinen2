@@ -83,7 +83,32 @@ public class Main {
                                 opretStævneTilEnKonkurrencesvømmer();
                                 break;
                             case 2:
-                                seOgSorterKonkurrencesvømmere();
+                                boolean kørProgram25 = true;
+                                Menu top5Menu = new Menu("* TOP 5 SVØMMERE *", "Vælg en mulighed: ", new String[]{ //NY TARA TODO
+                                    "1. Se top 5 indenfor crawl",
+                                    "2. Se top 5 indenfor brystsvømning",
+                                    "3. Se top 5 indenfor butterfly",
+                                    "4. Gå tilbage til træner-menuen"
+                                });
+                                while (kørProgram25) {
+                                    top5Menu.printMenu();
+                                    int brugervalg25 = top5Menu.brugerensValg();
+                                    switch (brugervalg25){
+                                        case 1:
+                                            seTop5Crawl();
+                                            seOgSorterKonkurrencesvømmere();
+                                            break;
+                                        case 2:
+                                            seTop5Brystsvømning();
+                                            break;
+                                        case 3:
+                                            seTop5Butterfly();
+                                            break;
+                                        case 4:
+                                            kørProgram25 = false;
+
+                                    }
+                                }
                                 break;
 
                             case 3:
@@ -636,5 +661,14 @@ public class Main {
 
     }
 
+    public void seTop5Crawl(){ //NY TARA TODO
+
+    }
+    public void seTop5Brystsvømning(){ //NY TARA TODO
+
+    }
+    public void seTop5Butterfly(){ //NY TARA TODO
+
+    }
 
 }
