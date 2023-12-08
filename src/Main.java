@@ -1,19 +1,16 @@
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.time.LocalDate;
 import java.time.Year;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.*;
 
-
 public class Main {
+    private ArrayList<Medlem> motionistMedlemmer = new ArrayList<>();
+    private ArrayList<Medlem> konkurrenceMedlemmer = new ArrayList<>();
     Træner crawlTræner;
     Træner brystsvømningTræner;
     Træner butterflyTræner;
     Scanner scanner = new Scanner(System.in);
-    private ArrayList<Medlem> motionistMedlemmer = new ArrayList<>();
-    private ArrayList<Medlem> konkurrenceMedlemmer = new ArrayList<>();
     Betaling betaling = new Betaling();
     Konkurrencesvømmer konkurrencesvømmer = new Konkurrencesvømmer();
     Medlem medlem = new Medlem();
@@ -80,39 +77,36 @@ public class Main {
                                 break;
                             case 2:
                                 boolean kørProgram25 = true;
-                                Menu top5Menu = new Menu("* TOP 5 SVØMMERE *", "Vælg en mulighed: ", new String[]{ //NY TARA TODO
+                                Menu top5Menu = new Menu("* TOP 5 SVØMMERE *", "Vælg en mulighed: ", new String[]{
                                         "1. Se top 5 indenfor crawl",
                                         "2. Se top 5 indenfor brystsvømning",
                                         "3. Se top 5 indenfor butterfly",
                                         "4. Gå tilbage til træner-menuen"
                                 });
+
                                 while (kørProgram25) {
                                     top5Menu.printMenu();
                                     int brugervalg25 = top5Menu.brugerensValg();
                                     switch (brugervalg25){
                                         case 1:
-                                            seTop5Crawl();
-                                            seOgSorterKonkurrencesvømmere();
+                                            seOgSorterKonkurrencesvømmere("Crawl");
                                             break;
                                         case 2:
-                                            seTop5Brystsvømning();
+                                            seOgSorterKonkurrencesvømmere("Brystsvømning");
                                             break;
                                         case 3:
-                                            seTop5Butterfly();
+                                            seOgSorterKonkurrencesvømmere("Butterfly");
                                             break;
                                         case 4:
                                             kørProgram25 = false;
-
                                     }
                                 }
                                 break;
-
                             case 3:
-                                System.out.println("Indtast svømmerens fulde navn: "); // ny mulighed
+                                System.out.println("Indtast svømmerens fulde navn: ");
                                 String fullName = scanner.nextLine();
                                 opdaterSvømmersBedsteTid(fullName);
                                 break;
-
                             case 4:
                                 kørProgram2 = false;
                                 break;
@@ -125,8 +119,6 @@ public class Main {
                             "1. Oversigt over medlemmer som har betalt kontingent",
                             "2. Oversigt over medlemmer som er i restance.",
                             "3. Gå tilbage til hoved-menuen"
-
-
                     });
 
                     while (kørProgram3) {
@@ -147,78 +139,45 @@ public class Main {
                     break;
                 default:
                     System.out.println("Dette er ikke en mulighed. Prøv igen 🙂");
-
             }
         }
     }
 
-
-    private void seOgSorterKonkurrencesvømmere() {
-        List<Konkurrencesvømmer> crawlJuniorSvømmere = new ArrayList<>();
-        List<Konkurrencesvømmer> crawlSeniorSvømmere = new ArrayList<>();
-        List<Konkurrencesvømmer> brystJuniorSvømmere = new ArrayList<>();
-        List<Konkurrencesvømmer> brystSeniorSvømmere = new ArrayList<>();
-        List<Konkurrencesvømmer> butterFlyJuniorSvømmere = new ArrayList<>();
-        List<Konkurrencesvømmer> butterFlySeniorSvømmere = new ArrayList<>();
+    public void seOgSorterKonkurrencesvømmere(String disciplin) {
+        List<Konkurrencesvømmer> juniorSvømmer = new ArrayList<>();
+        List<Konkurrencesvømmer> seniorSvømmer = new ArrayList<>();
 
         for (Medlem medlem : konkurrenceMedlemmer) {
             if (medlem instanceof Konkurrencesvømmer) {
                 Konkurrencesvømmer svømmer = ((Konkurrencesvømmer) medlem);
-                if (svømmer.getBedsteTid() != 0) { // lille tilføjelse
-                    if ("Crawl".equalsIgnoreCase(svømmer.getSvømmedisciplin())) {
-                        if (svømmer.erJunior()) {
-                            crawlJuniorSvømmere.add(svømmer);
-                        } else {
-                            crawlSeniorSvømmere.add(svømmer);
-                        }
-                    } else if ("BrystSvømning".equalsIgnoreCase(svømmer.getSvømmedisciplin())) {
-                        if (svømmer.erJunior()) {
-                            brystJuniorSvømmere.add(svømmer);
-                        } else {
-                            brystSeniorSvømmere.add(svømmer);
-                        }
-                    } else if ("Butterfly".equalsIgnoreCase(svømmer.getSvømmedisciplin())) {
-                        if (svømmer.erJunior()) {
-                            butterFlyJuniorSvømmere.add(svømmer);
-                        } else {
-                            butterFlySeniorSvømmere.add(svømmer);
-
-                        }
-                    }
+                if (svømmer.getBedsteTid() != 0 && svømmer.getSvømmedisciplin().equalsIgnoreCase(disciplin)) {
+                    sortSvømmere(svømmer,juniorSvømmer, seniorSvømmer );
                 }
             }
         }
-        Collections.sort(crawlJuniorSvømmere, new KonkurrencesvømmerBedsteTidComparator());
-        Collections.sort(crawlSeniorSvømmere, new KonkurrencesvømmerBedsteTidComparator());
-        Collections.sort(brystJuniorSvømmere, new KonkurrencesvømmerBedsteTidComparator());
-        Collections.sort(brystSeniorSvømmere, new KonkurrencesvømmerBedsteTidComparator());
-        Collections.sort(butterFlyJuniorSvømmere, new KonkurrencesvømmerBedsteTidComparator());
-        Collections.sort(butterFlySeniorSvømmere, new KonkurrencesvømmerBedsteTidComparator());
-
-        System.out.println("\nTop 5 i Crawl(Junior):");
-        visTop5(crawlJuniorSvømmere);
-        System.out.println("\nTop 5 i Crawl (Senior)");
-        visTop5(crawlSeniorSvømmere);
-        System.out.println("\nTop 5 i Brystsvømning(Junior");
-        visTop5(brystJuniorSvømmere);
-        System.out.println("\nTop 5 i Brystsvømning(Senior)");
-        visTop5(brystSeniorSvømmere);
-        System.out.println("\nTop 5 i Butterfly(Junior)");
-        visTop5(butterFlyJuniorSvømmere);
-        System.out.println("\nTop 5 i Butterfly(Senior");
-        visTop5(butterFlySeniorSvømmere);
+        sortOgVisTop5(disciplin, "Junior", juniorSvømmer);
+        sortOgVisTop5(disciplin, "Senior", seniorSvømmer);
     }
 
-    private void visTop5(List<Konkurrencesvømmer> svømmere) {
+    public void sortSvømmere(Konkurrencesvømmer svømmer, List<Konkurrencesvømmer> juniorSvømmere, List<Konkurrencesvømmer> seniorSvømmere) {
+        if (svømmer.erJunior()) {
+            juniorSvømmere.add(svømmer);
+        } else {
+            seniorSvømmere.add(svømmer);
+        }
+    }
+
+    public void sortOgVisTop5(String disciplin, String aldersgruppe, List<Konkurrencesvømmer> svømmere) {
+        Collections.sort(svømmere, new KonkurrencesvømmerBedsteTidComparator());
+
+        System.out.println("\nTop 5 i " + disciplin + " (" + aldersgruppe + "):");
         int topN = Math.min(5, svømmere.size());
         List<Konkurrencesvømmer> top5Svømmere = svømmere.subList(0, topN);
 
         for (Konkurrencesvømmer svømmer : top5Svømmere) {
-            System.out.println(svømmer.getNavn() + "-" + svømmer.getSvømmedisciplin() + "-Tid:" + svømmer.getBedsteTid()
-                    + "-Status:" + svømmer.erJunior());
+            System.out.println(svømmer.getNavn() + "-" + svømmer.getSvømmedisciplin() + "-Tid:" + svømmer.getBedsteTid());
         }
     }
-
 
     public Træner hvilkenTrænerSkalMedlemmetHave(Konkurrencesvømmer medlem) {
         if (medlem.getSvømmedisciplin().equalsIgnoreCase("crawl")) {
@@ -242,7 +201,7 @@ public class Main {
         butterflyTræner = new Træner("David Hasselhoff");
     }
 
-    public void opretStævneTilEnKonkurrencesvømmer() { // NYE LINJER HER
+    public void opretStævneTilEnKonkurrencesvømmer() {
         System.out.println("* OPRET STÆVNE *");
         System.out.println("Indtast det medlem der har været til stævne's fulde navn: ");
         String fuldeNavn = scanner.nextLine();
@@ -253,13 +212,10 @@ public class Main {
             System.out.println("Konkurrenten med navnet " + fuldeNavn + " kan ikke findes blandt medlemmer.");
             return;
         }
-
         System.out.println("Indtast stævne-navn: ");
         String stævneNavn = scanner.nextLine();
-
         double tid = 0;
         boolean validtInput = false;
-
         do {
             try {
                 System.out.println("Indtast tid: (mm,ss)");
@@ -269,9 +225,7 @@ public class Main {
                 System.out.println("Ugyldigt svar. Prøv igen.");
             }
         } while (!validtInput);
-
         int placering = 0;
-
         do {
             validtInput = false;
             try {
@@ -284,22 +238,16 @@ public class Main {
                 scanner.nextLine();
             }
         } while (!validtInput);
-
-        //Stævne nytStævne = new Stævne(stævneNavn, tid, placering); // LAVEDE FEJL I COMPILER
-        //konkurrencesvømmer.tilføjStævne(nytStævne); // LAVEDE FEJL I COMPILER
-
-        konkurrencesvømmer.setStævneNavn(stævneNavn); // TILFØJET
-        konkurrencesvømmer.setStævneTid(tid);  // TILFØJET
-        konkurrencesvømmer.setStævnePlacering(placering);  // TILFØJET
+        konkurrencesvømmer.setStævneNavn(stævneNavn);
+        konkurrencesvømmer.setStævneTid(tid);
+        konkurrencesvømmer.setStævnePlacering(placering);
         filer.gemKonkurrenceTilFil(konkurrenceMedlemmer, "KonkurrenceSvømmere.txt");
-        System.out.println("Navn: " + konkurrencesvømmer.getNavn() + ", stævne: " + stævneNavn + ", tid: " + tid + ", placering: " + placering);
-        //System.out.println("Stævne tilføjet til medlemmet: " + fuldeNavn + "\n" + nytStævne); / LAVEDE FEJL I COMPILER
-
-
+        System.out.println("Navn: " + konkurrencesvømmer.getNavn() + ", stævne: " + stævneNavn + ", tid: " + tid
+                + ", placering: " + placering);
     }
 
-    private Konkurrencesvømmer findMedlemUdFraFuldtNavn(String fuldeNavn) {
-        for (Medlem medlem : konkurrenceMedlemmer) { // ÆNDRET TIL DEN RIGTIGE LISTE
+    public Konkurrencesvømmer findMedlemUdFraFuldtNavn(String fuldeNavn) {
+        for (Medlem medlem : konkurrenceMedlemmer) {
             if (medlem instanceof Konkurrencesvømmer && medlem.getNavn().equalsIgnoreCase(fuldeNavn)) {
                 System.out.println("Medlem fundet!");
                 return (Konkurrencesvømmer) medlem;
@@ -309,15 +257,17 @@ public class Main {
         return null;
     }
 
-    public void opdaterSvømmersBedsteTid(String fuldeNavn) { // LIGE SAT IND
+    public void opdaterSvømmersBedsteTid(String fuldeNavn) {
         boolean blevMedlemFundet = false;
         for (int i = 0; i < konkurrenceMedlemmer.size(); i++) {
-            if (konkurrenceMedlemmer.get(i) instanceof Konkurrencesvømmer && konkurrenceMedlemmer.get(i).getNavn().equalsIgnoreCase(fuldeNavn)) {
+            if (konkurrenceMedlemmer.get(i) instanceof Konkurrencesvømmer &&
+                    konkurrenceMedlemmer.get(i).getNavn().equalsIgnoreCase(fuldeNavn)) {
                 System.out.println("Medlem fundet!");
                 System.out.println("Indtast " + fuldeNavn + "'s nye tid: ");
                 double nyTid = scanner.nextDouble();
                 scanner.nextLine();
-                if (nyTid < ((Konkurrencesvømmer) konkurrenceMedlemmer.get(i)).getBedsteTid() || ((Konkurrencesvømmer) konkurrenceMedlemmer.get(i)).getBedsteTid() == 0) {
+                if (nyTid < ((Konkurrencesvømmer) konkurrenceMedlemmer.get(i)).getBedsteTid() || ((Konkurrencesvømmer)
+                        konkurrenceMedlemmer.get(i)).getBedsteTid() == 0) {
                     ((Konkurrencesvømmer) konkurrenceMedlemmer.get(i)).setBedsteTid(nyTid);
                     filer.gemKonkurrenceTilFil(konkurrenceMedlemmer, "KonkurrenceSvømmere.txt");
                 } else {
@@ -333,12 +283,9 @@ public class Main {
         if (!blevMedlemFundet) {
             System.out.println(fuldeNavn + " blev ikke fundet");
         }
-
     }
 
-
-
-    public void opretMedlem() { // NYE LINJER HER
+    public void opretMedlem() {
         System.out.println("* OPRET NYT MEDLEM *");
         System.out.println("Indtast fulde navn:");
         String navn = scanner.nextLine();
@@ -346,7 +293,7 @@ public class Main {
         int fødselsår = 0;
         boolean gyldigtFødselsår = false;
 
-        while (!gyldigtFødselsår) { // NY while-løkke, for at finde ud af om fødselsåret er validt!
+        while (!gyldigtFødselsår) {
             try {
                 System.out.println("Indtast fødselsår: (YYYY)");
                 fødselsår = scanner.nextInt();
@@ -355,7 +302,8 @@ public class Main {
                 if (erFødselsåretValidt(fødselsår)) {
                     gyldigtFødselsår = true;
                 } else {
-                    System.out.println("Ugyldigt fødselsår. Indtast et gyldigt år, eller kontakt personalet for spørgsmål."); // hehe er jeg ikke sjov
+                    System.out.println("Ugyldigt fødselsår. Indtast et gyldigt år, eller kontakt personalet " +
+                            "for spørgsmål.");
                 }
             } catch (InputMismatchException e) {
                 System.out.println("Indtast et årstal. Prøv igen.");
@@ -363,31 +311,29 @@ public class Main {
                 fødselsår = 0;
             }
         }
-
         String aktivEllerPassivSomOrd = aktivEllerPassivSomOrd();
         String erKontingentBetaltSomOrd = erKontingentBetaltSomOrd();
         String motionistEllerKonkurrenceSomOrd = motionistEllerKonkurrenceSomOrd();
 
-        Medlem nytMedlem = new Medlem(navn, fødselsår, aktivEllerPassivSomOrd, erKontingentBetaltSomOrd, motionistEllerKonkurrenceSomOrd);
+        Medlem nytMedlem = new Medlem(navn, fødselsår, aktivEllerPassivSomOrd, erKontingentBetaltSomOrd,
+                motionistEllerKonkurrenceSomOrd);
 
-        nytMedlem.setErKontingentBetalt(erKontingentBetaltSomOrd(nytMedlem)); // NY LINJE
-
+        nytMedlem.setErKontingentBetalt(erKontingentBetaltSomOrd(nytMedlem));
 
         if (nytMedlem.getMotionistEllerKonkurrence().equalsIgnoreCase("konkurrence")) {
             opretKonkurrenceSvømmer(nytMedlem);
         } else {
             motionistMedlemmer.add(nytMedlem);
-            System.out.println("Medlem oprettet: " + nytMedlem);
+            System.out.println("Medlem oprettet: " + nytMedlem.getNavn() + "\nFor fulde oplysninger om medlemmet, " +
+                    "gå til 'Se medlemmer' i formand-menuen.");
             filer.gemMotionisterTilFil(motionistMedlemmer, "motionistsvømmere.txt");
-
         }
     }
 
-    public boolean erFødselsåretValidt(int år) { // NY METODE
+    public boolean erFødselsåretValidt(int år) {
         int aktueltÅr = Year.now().getValue();
         return år >= aktueltÅr - 100 && år <= aktueltÅr - 1;
     }
-
 
     public void opretKonkurrenceSvømmer(Medlem nytMedlem) {
         opretTrænere();
@@ -459,19 +405,18 @@ public class Main {
                 }
             } while (!validtInput);
         }
-
         Konkurrencesvømmer konkurrencesvømmer = new Konkurrencesvømmer(nytMedlem.getNavn(), nytMedlem.getFødselsår(),
                 nytMedlem.getAktivEllerPassiv(), nytMedlem.getErKontingentBetalt(),
-                // nytMedlem.getMotionistEllerKonkurrence(), svømmeDisciplinSomOrd, bedsteTid, dato);
-                nytMedlem.getMotionistEllerKonkurrence(), svømmeDisciplinSomOrd, bedsteTid, dato, stævneNavn, stævneTid, placering);
+                nytMedlem.getMotionistEllerKonkurrence(), svømmeDisciplinSomOrd, bedsteTid, dato, stævneNavn,
+                stævneTid, placering);
         hvilkenTrænerSkalMedlemmetHave(konkurrencesvømmer);
         konkurrenceMedlemmer.add(konkurrencesvømmer);
         filer.gemKonkurrenceTilFil(konkurrenceMedlemmer, "konkurrencesvømmere.txt");
-        System.out.println("Medlem oprettet: " + konkurrencesvømmer);
-
+        System.out.println("Medlem oprettet: " + konkurrencesvømmer.getNavn() + "\nFor fulde oplysninger om medlemmet, " +
+                "gå til 'Se medlemmer' i formand-menuen.");
     }
 
-    public double indtastGyldigTid() throws InputMismatchException {
+    public double indtastGyldigTid() throws InputMismatchException { // KONKURRENCESVØMMER KLASSEN
         return konkurrencesvømmer.indtastGyldigTid();
     }
 
@@ -487,11 +432,9 @@ public class Main {
         return medlem.erKontingentBetaltSomOrd(medlem);
     }
 
-
     public String motionistEllerKonkurrenceSomOrd() { // MEDLEMS KLASSEN
         return medlem.motionistEllerKonkurrenceSomOrd();
     }
-
 
     public String svømmeDisciplinSomOrd() { // KONKURRENCESVØMMER KLASSEN
         return konkurrencesvømmer.svømmeDisciplinSomOrd();
@@ -503,27 +446,9 @@ public class Main {
 
     public void seMedlemmerBetalt() { // BETALINGS KLASSEN
         betaling.seMedlemmerBetalt(motionistMedlemmer, konkurrenceMedlemmer);
-
     }
 
     public void seMedlemmerRestance() { // BETALINGS KLASSEN
         betaling.seMedlemmerRestance(motionistMedlemmer, konkurrenceMedlemmer);
-
     }
-
-
-
-
-
-    public void seTop5Crawl(){ //NY TARA TODO
-
-    }
-    public void seTop5Brystsvømning(){ //NY TARA TODO
-
-    }
-    public void seTop5Butterfly(){ //NY TARA TODO
-
-    }
-
-
 }

@@ -1,21 +1,16 @@
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.InputMismatchException;
 import java.util.Scanner;
 
 public class Konkurrencesvømmer extends Medlem {
     Scanner scanner = new Scanner(System.in);
-    private ArrayList<Stævne> stævner; //TARA NY LINJE
     private String svømmedisciplin;
-    private Træner træner; // NY LINJE
+    private Træner træner;
     private double bedsteTid;
     private LocalDate dato;
     private String stævneNavn;
     private double stævneTid;
     private int stævnePlacering;
-
-
 
     public Konkurrencesvømmer(String navn, int fødselsår, String aktivEllerPassiv, String erKontingentBetalt, String motionistEllerKonkurrence
             , String svømmedisciplin, double bedsteTid, LocalDate dato, String stævneNavn, double stævneTid, int stævnePlacering) {
@@ -23,13 +18,9 @@ public class Konkurrencesvømmer extends Medlem {
         this.svømmedisciplin = svømmedisciplin;
         this.bedsteTid = bedsteTid;
         this.dato = dato;
-        //  this.stævner = new ArrayList<>(); //TARA NY LINJE
-        // tilføjStævne(stævneNavn, stævneTid, stævnePlacering);
         this.stævneNavn = stævneNavn;
         this.stævneTid = stævneTid;
         this.stævnePlacering = stævnePlacering;
-
-
     }
 
     public Konkurrencesvømmer() {
@@ -46,7 +37,7 @@ public class Konkurrencesvømmer extends Medlem {
                 int minutter = Integer.parseInt(tidArray[0].trim());
                 int sekunder = Integer.parseInt(tidArray[1].trim());
 
-                bedsteTid = minutter + sekunder / 100.0; // Gem som decimaltal
+                bedsteTid = minutter + sekunder / 100.0;
 
                 korrektFormat = true;
             } catch (NumberFormatException | ArrayIndexOutOfBoundsException e) {
@@ -58,7 +49,8 @@ public class Konkurrencesvømmer extends Medlem {
 
     public String svømmeDisciplinSomOrd() {
         while (true) {
-            System.out.println("Indtast hvilken svømmedisciplin medlemmet skal registreres i: ('c' for Crawl. 'b' for Brystsvømning. 'bf' for Butterfly)");
+            System.out.println("Indtast hvilken svømmedisciplin medlemmet skal registreres i: ('c' for Crawl. " +
+                    "'b' for Brystsvømning. 'bf' for Butterfly)");
             String bogstav = scanner.nextLine();
 
             if (bogstav.equalsIgnoreCase("c")) {
@@ -74,18 +66,13 @@ public class Konkurrencesvømmer extends Medlem {
     }
 
 
-    public void tilføjStævne(String stævneNavn, double tid, int placering) {
-        Stævne stævne = new Stævne(stævneNavn, tid, stævnePlacering);
-        stævner.add(stævne);
-    }
-
-
     public String getSvømmedisciplin() {
         return svømmedisciplin;
     }
 
-
-
+    public LocalDate getDato() {
+        return dato;
+    }
 
     public double getBedsteTid() {
         return bedsteTid;
@@ -95,39 +82,28 @@ public class Konkurrencesvømmer extends Medlem {
         this.bedsteTid = bedsteTid;
     }
 
-    public void setTræner(Træner træner) { // NY METODE
-        this.træner = træner;
-    }
-
     public Træner getTræner() {
         return træner;
     }
 
-    public ArrayList<Stævne> getStævner() { //TARA NY LINJE
-        return stævner;
-    }
-    public void tilføjStævne(Stævne stævne){ //TARA NY LINJE
-        stævner.add(stævne);
-    }
-
-    public LocalDate getDato() {
-        return dato;
-    }
-
-    public void setStævneNavn(String stævneNavn) {
-        this.stævneNavn = stævneNavn;
+    public void setTræner(Træner træner) {
+        this.træner = træner;
     }
 
     public String getStævneNavn() {
         return stævneNavn;
     }
 
-    public void setStævneTid(double stævneTid) {
-        this.stævneTid = stævneTid;
+    public void setStævneNavn(String stævneNavn) {
+        this.stævneNavn = stævneNavn;
     }
 
     public double getStævneTid() {
         return stævneTid;
+    }
+
+    public void setStævneTid(double stævneTid) {
+        this.stævneTid = stævneTid;
     }
 
     public int getStævnePlacering() {
@@ -138,15 +114,8 @@ public class Konkurrencesvømmer extends Medlem {
         this.stævnePlacering = stævnePlacering;
     }
 
-    public String getFormattedDato() {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
-        return dato.format(formatter);
-    }
-
-
     @Override
     public String toString() {
-        // Tilføj bedste tid og dato, undlad træner information eller andre komplekse data
         return super.toString() + "," + svømmedisciplin + "," + bedsteTid + "," + dato + "," + stævneNavn + "," + stævneTid + "," + stævnePlacering;
     }
 }

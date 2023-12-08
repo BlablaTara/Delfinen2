@@ -2,12 +2,8 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 
 public class Betaling {
-    private ArrayList<Medlem> kontigentBetal;
-    private ArrayList<Medlem> kontigentRestance;
 
     public Betaling() {
-        kontigentBetal = new ArrayList<>();
-        kontigentRestance = new ArrayList<>();
     }
 
     public void seMedlemmerBetalt(ArrayList<Medlem> motionister, ArrayList<Medlem> konkurrence) {
@@ -17,7 +13,6 @@ public class Betaling {
                 System.out.println(motionister.get(i).getNavn() + " - " + motionister.get(i).getErKontingentBetalt());
             }
         }
-
         for (int i = 0; i < konkurrence.size(); i++) {
             if (konkurrence.get(i).getErKontingentBetalt().contains("betalt")) {
                 System.out.println(konkurrence.get(i).getNavn() + " - " + konkurrence.get(i).getErKontingentBetalt());
@@ -25,22 +20,18 @@ public class Betaling {
         }
     }
 
-
     public void seMedlemmerRestance(ArrayList<Medlem> motionister, ArrayList<Medlem> konkurrence) {
         System.out.println("Medlemmer der er i restance:");
         for (int i = 0; i < motionister.size(); i++) {
             if (motionister.get(i).getErKontingentBetalt().contains("Restance")) {
                 System.out.println(motionister.get(i).getNavn() + " - " + motionister.get(i).getErKontingentBetalt() + "kr");
             }
-
-
         }
 
         for (int i = 0; i < konkurrence.size(); i++) {
             if (konkurrence.get(i).getErKontingentBetalt().contains("Restance")) {
                 System.out.println(konkurrence.get(i).getNavn() + " - " + konkurrence.get(i).getErKontingentBetalt() + "kr");
             }
-
         }
     }
 

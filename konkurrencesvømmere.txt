@@ -1,4 +1,4 @@
-Aktiv,Egon,1994,Medlemskab på: 1600.0kr. er betalt d. 06-12-2023,Konkurrence,Crawl,16.42,2023-12-06,DGI byen,15.0,4
+Aktiv,Egon,1994,Medlemskab på: 1600.0kr. er betalt d. 06-12-2023,Konkurrence,Crawl,16.42,2023-12-06,herlev stævnet,11.23,2
 Aktiv,Kjeld,1990,Medlemskab på: 1600.0kr. er betalt d. 06-12-2023,Konkurrence,Crawl,12.05,2023-10-02,Medlem har ikke deltaget i et stævne,0.0,0
 Aktiv,Børge,1999,Restance på: 1600.0,Konkurrence,Crawl,11.58,2022-06-05,Medlem har ikke deltaget i et stævne,0.0,0
 Aktiv,Gertrud,1999,Restance på: 1600.0,Konkurrence,Crawl,10.23,2023-09-01,Birkerød,9.54,2
@@ -9,3 +9,5 @@ Passiv,Viktor,1950,Medlemskab på: 500.0kr. er betalt d. 06-12-2023,Konkurrence,
 Aktiv,Quinn,1985,Restance på: 1600.0,Konkurrence,Brystsvømning,16.22,2021-04-04,RandomStævne,19.22,3
 Aktiv,Ronald,1992,Medlemskab på: 1600.0kr. er betalt d. 06-12-2023,Konkurrence,Brystsvømning,11.51,2009-05-01,Medlem har ikke deltaget i et stævne,0.0,0
 Aktiv,Jens,2013,Restance på: 1000.0,Konkurrence,Butterfly,11.26,2023-12-05,jensensbøfhus,15.0,3
+Aktiv,tara,1989,Restance på: 1600.0,Konkurrence,Crawl,0.0,2023-12-08,blabla,12.34,2
+Aktiv,Eva,1962,Medlemskab på: 1200.0kr. er betalt d. 08-12-2023,Konkurrence,Brystsvømning,56.34,2000-06-05,Medlem har ikke deltaget i et stævne,0.0,0

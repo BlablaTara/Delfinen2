@@ -8,15 +8,10 @@ public class Medlem {
     Scanner scanner = new Scanner(System.in);
     private String navn;
     private int fødselsår;
-    private int alder;
     private String aktivEllerPassiv;
     private String erKontingentBetalt;
     private String motionistEllerKonkurrence;
-    private String juniorEllerSenior;
-    ArrayList<Stævne> stævner = new ArrayList<>();
     Betaling betaling = new Betaling();
-
-
 
     public Medlem(String navn, int fødselsår, String aktivEllerPassiv, String erKontingentBetalt, String motionistEllerKonkurrence) {
         this.navn = navn;
@@ -27,6 +22,30 @@ public class Medlem {
     }
 
     public Medlem() {
+    }
+
+    public String getNavn() {
+        return navn;
+    }
+
+    public int getFødselsår() {
+        return fødselsår;
+    }
+
+    public String getMotionistEllerKonkurrence() {
+        return motionistEllerKonkurrence;
+    }
+
+    public String getErKontingentBetalt() {
+        return erKontingentBetalt;
+    }
+
+    public void setErKontingentBetalt(String erKontingentBetalt) {
+        this.erKontingentBetalt = erKontingentBetalt;
+    }
+
+    public String getAktivEllerPassiv() {
+        return aktivEllerPassiv;
     }
 
     public String aktivEllerPassivSomOrd() {
@@ -49,10 +68,7 @@ public class Medlem {
             System.out.println("Vil medlemmet betale nu eller senere? Tast 'n' for nu. Tast 's' for senere.");
             String nEllerS = scanner.nextLine();
             if (nEllerS.equalsIgnoreCase("n")) {
-                LocalDate dato = LocalDate.now(); // kan slettes tror jeg
-                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy"); // kan slettes tror jeg
-                String formattedDato = dato.format(formatter); // kan slettes tror jeg
-                return "Kontingent betalt ";// + formattedDato; // DET VAR ET MELLEMRUM DER GJORDE FEJLEN
+                return "Kontingent betalt ";
             } else if (nEllerS.equalsIgnoreCase("s")) {
                 return "RESTANCE";
             } else {
@@ -61,9 +77,8 @@ public class Medlem {
         }
     }
 
-
     public String erKontingentBetaltSomOrd(Medlem medlem) {
-        if (medlem.getErKontingentBetalt().equalsIgnoreCase("Kontingent betalt ")) { // LAVET ET MELLEMRUM
+        if (medlem.getErKontingentBetalt().equalsIgnoreCase("Kontingent betalt ")) {
             LocalDate dato = LocalDate.now();
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
             String formattedDato = dato.format(formatter);
@@ -72,10 +87,9 @@ public class Medlem {
             String medlemsPrisSomString = String.valueOf(medlemsPris);
             return "Medlemskab på: " + medlemsPrisSomString + "kr. er betalt d. " + formattedDato;
         }
-        String returnText = betaling.kontigentRestance(medlem); // DETTE ER NYT
-        return returnText; // DETTE ER NYT
+        String returnText = betaling.kontigentRestance(medlem);
+        return returnText;
     }
-
 
     public String motionistEllerKonkurrenceSomOrd() {
         while (true) {
@@ -91,7 +105,6 @@ public class Medlem {
             }
         }
     }
-
 
     public void seMedlemmer(ArrayList<Medlem> motionistMedlemmer, ArrayList<Medlem> konkurrenceMedlemmer) {
         String linjer = "-------------------------------------------------------------------";
@@ -124,69 +137,17 @@ public class Medlem {
                 System.out.print(" - Stævne: " + konkurrencesvømmer.getStævneNavn());
                 System.out.print(" - Stævne tid: " + konkurrencesvømmer.getStævneTid());
                 System.out.println(" - Stævne placering: " + konkurrencesvømmer.getStævnePlacering() + "\n");
-
-
             }
-
-
         }
     }
 
-    public String getNavn() {
-        return navn;
-    }
-
-    public int getFødselsår() {
-        return fødselsår;
-    }
-
-    public int setAlder(int fødselsår) {
-        this.alder = LocalDateTime.now().getYear() - fødselsår;
-        return alder;
-    }
-
-    public String getMotionistEllerKonkurrence() {
-        return motionistEllerKonkurrence;
-    }
-
-
-    public void setAktivEllerPassiv(String aktivEllerPassiv){
-        this.aktivEllerPassiv = aktivEllerPassiv;
-    }
-
-    public String getErKontingentBetalt() {
-        return erKontingentBetalt;
-    }
-
-    public void setErKontingentBetalt(String erKontingentBetalt) {
-        this.erKontingentBetalt = erKontingentBetalt;
-    }
-
-    public String getAktivEllerPassiv() {
-        return aktivEllerPassiv;
-    }
-
-    public String setJuniorEllerSenior(int fødselsår) {
+    public boolean erJunior() {
         int alder = LocalDateTime.now().getYear() - fødselsår;
-        if (alder < 18) {
-            return "Juniorhold";
-        } else {
-            return "Seniorhold";
-        }
+        return alder <18;
     }
-
-    public void tilføjStævne(Stævne stævne) {
-        stævner.add(stævne);
-    }
-
 
     @Override
     public String toString() {
-        // Simpel og klar CSV format
         return aktivEllerPassiv + "," + navn + "," + fødselsår + "," + erKontingentBetalt + "," + motionistEllerKonkurrence;
-    }
-    public boolean erJunior(){
-        int alder = LocalDateTime.now().getYear() - fødselsår;
-        return alder <18;
     }
 }

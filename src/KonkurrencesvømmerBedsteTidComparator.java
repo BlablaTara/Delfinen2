@@ -12,4 +12,5 @@ class KonkurrencesvømmerBedsteTidComparator implements Comparator<Konkurrencesv
         }
 
         return disciplinComparison;
-    }}
+    }
+}

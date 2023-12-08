@@ -1,13 +1,11 @@
 import java.io.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Set;
 
 public class Filer {
 
     public void gemMotionisterTilFil(ArrayList<Medlem> motionistMedlemmer, String filnavn) {
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(filnavn))) { // Bemærk 'true' her
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(filnavn))) {
             for (Medlem medlem : motionistMedlemmer) {
                 writer.write(medlem.toString());
                 writer.newLine();
@@ -18,7 +16,7 @@ public class Filer {
     }
 
     public void gemKonkurrenceTilFil(ArrayList<Medlem> konkurrenceMedlemmer, String filnavn) {
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(filnavn))) { // Bemærk 'true' her
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(filnavn))) {
             for (Medlem medlem : konkurrenceMedlemmer) {
                 writer.write(medlem.toString());
                 writer.newLine();
@@ -56,10 +54,8 @@ public class Filer {
         return konkurrenceMedlemmer;
     }
 
-    private Medlem opretMedlemFraString(String linje) {
+    public Medlem opretMedlemFraString(String linje) {
         String[] data = linje.split(",");
-        // Format: aktivEllerPassiv,navn,fødselsår,erKontingentBetalt,motionistEllerKonkurrence
-
         String aktivEllerPassiv = data[0];
         String navn = data[1];
         int fødselsår = Integer.parseInt(data[2]);
@@ -69,10 +65,8 @@ public class Filer {
         return new Medlem(navn, fødselsår, aktivEllerPassiv, erKontingentBetalt, motionistEllerKonkurrence);
     }
 
-    private Konkurrencesvømmer opretKonkurrenceMedlemFraString(String linje) {
+    public Konkurrencesvømmer opretKonkurrenceMedlemFraString(String linje) {
         String[] data = linje.split(",");
-        // Format: aktivEllerPassiv,navn,fødselsår,erKontingentBetalt,motionistEllerKonkurrence,svømmedisciplin,bedsteTid,dato
-
         String aktivEllerPassiv = data[0];
         String navn = data[1];
         int fødselsår = Integer.parseInt(data[2]);
@@ -85,6 +79,7 @@ public class Filer {
         double stævneTid = Double.parseDouble(data[9]);
         int stævnePlacering = Integer.parseInt(data[10]);
 
-        return new Konkurrencesvømmer(navn, fødselsår, aktivEllerPassiv, erKontingentBetalt, motionistEllerKonkurrence, svømmedisciplin, bedsteTid, dato, stævneNavn, stævneTid, stævnePlacering);
+        return new Konkurrencesvømmer(navn, fødselsår, aktivEllerPassiv, erKontingentBetalt, motionistEllerKonkurrence,
+                svømmedisciplin, bedsteTid, dato, stævneNavn, stævneTid, stævnePlacering);
     }
 }
