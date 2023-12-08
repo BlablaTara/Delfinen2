@@ -87,6 +87,4 @@ public class Filer {
 
         return new Konkurrencesvømmer(navn, fødselsår, aktivEllerPassiv, erKontingentBetalt, motionistEllerKonkurrence, svømmedisciplin, bedsteTid, dato, stævneNavn, stævneTid, stævnePlacering);
     }
-
-
 }

@@ -1,8 +1,11 @@
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.InputMismatchException;
+import java.util.Scanner;
 
 public class Konkurrencesvømmer extends Medlem {
+    Scanner scanner = new Scanner(System.in);
     private ArrayList<Stævne> stævner; //TARA NY LINJE
     private String svømmedisciplin;
     private Træner træner; // NY LINJE
@@ -27,6 +30,47 @@ public class Konkurrencesvømmer extends Medlem {
         this.stævnePlacering = stævnePlacering;
 
 
+    }
+
+    public Konkurrencesvømmer() {
+    }
+
+    public double indtastGyldigTid() throws InputMismatchException {
+        double bedsteTid = 0;
+        boolean korrektFormat = false;
+
+        while (!korrektFormat) {
+            try {
+                String tidInput = scanner.nextLine();
+                String[] tidArray = tidInput.split(",");
+                int minutter = Integer.parseInt(tidArray[0].trim());
+                int sekunder = Integer.parseInt(tidArray[1].trim());
+
+                bedsteTid = minutter + sekunder / 100.0; // Gem som decimaltal
+
+                korrektFormat = true;
+            } catch (NumberFormatException | ArrayIndexOutOfBoundsException e) {
+                System.out.println("Ugyldigt tidsformat. Prøv igen (mm,ss):");
+            }
+        }
+        return bedsteTid;
+    }
+
+    public String svømmeDisciplinSomOrd() {
+        while (true) {
+            System.out.println("Indtast hvilken svømmedisciplin medlemmet skal registreres i: ('c' for Crawl. 'b' for Brystsvømning. 'bf' for Butterfly)");
+            String bogstav = scanner.nextLine();
+
+            if (bogstav.equalsIgnoreCase("c")) {
+                return "Crawl";
+            } else if (bogstav.equalsIgnoreCase("b")) {
+                return "Brystsvømning";
+            } else if (bogstav.equalsIgnoreCase("bf")) {
+                return "Butterfly";
+            } else {
+                System.out.println("Ugyldigt bogstav. Prøv igen.");
+            }
+        }
     }
 
 
